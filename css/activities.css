@@ -1,0 +1,18 @@
+.activity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin-top: 2rem; }
+.activity-card { overflow: hidden; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.activity-photos { background: var(--blue-050); }
+.activity-slide { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
+.is-ready .activity-photos { display: grid; }
+.is-ready .activity-slide { grid-area: 1 / 1; opacity: 0; transition: opacity 450ms ease-in-out; pointer-events: none; }
+.is-ready .activity-slide.is-active { opacity: 1; }
+.activity-slide[hidden], .activity-controls[hidden] { display: none; }
+.activity-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; border-top: 1px solid var(--line); }
+.activity-controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 50%; background: var(--white); color: var(--blue-900); font-size: 1.5rem; cursor: pointer; }
+.activity-controls button:hover { background: var(--blue-100); }
+.activity-counter { margin: 0; color: var(--muted); font-size: .9rem; }
+.activity-caption { padding: 1.5rem; }
+.activity-caption h2 { font-size: 1.5rem; margin-bottom: .5rem; }
+.activity-caption p { color: var(--muted); margin: 0; }
+.activity-contact { margin-top: 2rem; }
+@media (max-width: 700px) { .activity-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
+@media (prefers-reduced-motion: reduce) { .is-ready .activity-slide { transition: none; } }

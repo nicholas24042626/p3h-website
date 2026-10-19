@@ -1,0 +1,2 @@
+.contact-layout { display: grid; gap: var(--space-4); }
+@media (min-width: 760px) { .contact-layout { grid-template-columns: .8fr 1.2fr; } }

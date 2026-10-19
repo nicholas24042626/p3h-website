@@ -1,0 +1,1 @@
+.map-placeholder { min-height: 18rem; border: 3px dashed var(--blue-700); display: grid; place-items: center; background: var(--blue-100); border-radius: var(--radius); }
