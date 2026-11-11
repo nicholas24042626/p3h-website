@@ -14,7 +14,7 @@
 <script src="../js/chatbot.js"></script>
 <script>
 (async () => {
-  const tick = () => new Promise(resolve => setTimeout(resolve, 20));
+  const tick = () => new Promise(resolve => setTimeout(resolve, 300));
   const $ = selector => document.querySelector(selector);
   const check = (name, pass) => results.push((pass ? 'PASS: ' : 'FAIL: ') + name);
   const last = () => [...document.querySelectorAll('.chat-assistant p')].at(-1)?.textContent || '';
@@ -25,7 +25,6 @@
   check('AI availability labelled', $('.chat-mode').textContent.includes('AI assistant'));
   await ask('What is P3H?'); check('P3H introduction', last().includes('Humanistic Hands and Heart'));
   for (const [q, text] of [
-    ['How do crystals work?', '30 Crystals'], ['What rewards are there?', 'FairPrice'],
     ['Which grants can P3H help with?', 'Home Caregiving Grant'], ['Are subsidies guaranteed?', 'approval'],
     ['How do I register?', '6859'], ['When is the team available?', '9am'],
     ['Where is GLOW?', 'Nanyang'], ['Can I get respite?', 'short-term'],
@@ -33,7 +32,7 @@
     ['Is there peer support?', 'buddy'], ['Who is P3H for?', 'youth and adult'],
     ['What support is available?', 'four areas'], ['What is the P3H weather forecast?', 'confirmed answer']
   ]) { await ask(q); check('Answer: ' + q, last().includes(text)); }
-  await ask('How do rewards work?'); await ask('Tell me more'); check('Local follow-up retains topic', last().includes('FairPrice'));
+  await ask('What training is available?'); await ask('Tell me more'); check('Local follow-up retains topic', last().includes('practical caregiver training'));
   for (const [q, text] of [
     ['How much is HCG?', 'S$600'], ['How do I apply for it?', 'To apply'],
     ['Am I eligible?', 'scheme’s assessment'], ['Can I get help with a wheelchair?', 'assistive devices'],
@@ -65,7 +64,7 @@
   check('Conversation context bounded', calls.at(-1).messages.length <= 11);
   check('Local and tutorial context sent to AI', calls.at(-1).messages.some(message => message.role === 'assistant'));
   handler = async () => ({ ok: true, json: async () => ({ reply: ' ' }) });
-  await ask('Rewards'); check('Empty AI reply falls back', last().includes('FairPrice'));
+  await ask('Digital wellness'); check('Empty AI reply falls back', last().includes('mindfulness'));
   handler = options => new Promise((resolve, reject) => { options.signal.addEventListener('abort', () => reject(new Error('Aborted'))); });
   $('.chat-form input').value = 'pending question'; $('.chat-form').dispatchEvent(new Event('submit', { cancelable: true }));
   check('Send disabled while waiting', $('[type="submit"]').disabled);

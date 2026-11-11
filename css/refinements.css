@@ -119,7 +119,6 @@ a:hover { color: var(--orange-dark); }
 .launch-banner { padding: 1.75rem 2rem; background: #fff6ed; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 2.5rem; }
 .launch-banner p { max-width: 49rem; }
 .wellness-grid { margin-top: 1.75rem; }
-.reward-panel { display: grid; gap: 2rem; align-items: center; padding: 2rem; border-radius: var(--radius); background: #fff1e4; }
 .financial-support { margin-bottom: 2rem; scroll-margin-top: 110px; }
 .grant-grid { margin-top: 1.5rem; }
 .grant-category + .grant-category { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
@@ -158,12 +157,6 @@ a:hover { color: var(--orange-dark); }
 .grant-daily { --grant-accent: var(--blue-700); }
 .grant-caregiving { --grant-accent: var(--coral); }
 .grant-training { --grant-accent: var(--gold); }
-#crystal-rewards { scroll-margin-top: 110px; }
-.reward-summary { background: #fffdf9; padding: 1.75rem; border-radius: 12px; text-align: center; }
-.reward-summary h3 { margin-top: .5rem; }
-.reward-equals { font-size: 1.7rem; color: var(--orange-dark); }
-.reward-steps { padding-left: 1.3rem; }
-.reward-steps li { padding: .5rem 0 .5rem .4rem; }
 .accordion { display: grid; gap: 1rem; padding: 0; background: transparent; border: 0; box-shadow: none; align-items: start; }
 .faq-item, .faq-item:last-child { background: white; border: 1px solid var(--line); border-radius: 20px; padding: 0 1.5rem; box-shadow: 0 5px 20px #49352c08; }
 .faq-item summary { padding: 1.3rem 0; cursor: pointer; font-weight: 650; line-height: 1.5; }
@@ -173,7 +166,7 @@ a:hover { color: var(--orange-dark); }
 .stream-detail h2:not(:first-child) { margin-top: 1rem; }
 .stream-detail .detail-photo { aspect-ratio: 4 / 3; margin-bottom: 1.25rem; }
 .activity-card { border-radius: 20px; box-shadow: 0 5px 20px #49352c08; }
-main .section > .container:not(.grid):not(.accordion):not(.programme-summary):not(.financial-support):not(.stream-nav):not(.reward-panel):has(> h2:first-child):not(:has(> .grid)) { padding: 1.75rem; background: white; border: 1px solid var(--line); border-radius: 20px; }
+main .section > .container:not(.grid):not(.accordion):not(.programme-summary):not(.financial-support):not(.stream-nav):has(> h2:first-child):not(:has(> .grid)) { padding: 1.75rem; background: white; border: 1px solid var(--line); border-radius: 20px; }
 .stream-nav { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; }
 .site-footer { background: #f6ece3; color: var(--muted); border-top: 1px solid var(--line); padding: 2.5rem 0 1.25rem; font-size: .88rem; }
 .site-footer h2, .site-footer h3 { color: var(--ink); }
@@ -185,7 +178,7 @@ main .section > .container:not(.grid):not(.accordion):not(.programme-summary):no
 [hidden] { display: none !important; }
 html:not(.js) .main-nav { display: block; }
 html:not(.js) .menu-toggle { display: none; }
-@media (min-width: 800px) { .wellness-grid { grid-template-columns: repeat(3, 1fr); } .reward-panel { grid-template-columns: 1.8fr 1fr; } }
+@media (min-width: 800px) { .wellness-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 800px) { .programme-summary { flex-direction: column; align-items: flex-start; gap: 1.25rem; } }
 @media (max-width: 760px) { .grid-3 { grid-template-columns: 1fr; } }
 @media (max-width: 480px) {
@@ -195,6 +188,6 @@ html:not(.js) .menu-toggle { display: none; }
   .brand .programme-brand img { width: 140px; }
   .brand .p3h-logo { width: 46px; height: 46px; }
   .section { padding: 2.5rem 0; }
-  .card, .empty-state, .reward-panel, .launch-banner { padding: 1.4rem; }
+  .card, .empty-state, .launch-banner { padding: 1.4rem; }
   .button-row .button { width: 100%; text-align: center; }
 }

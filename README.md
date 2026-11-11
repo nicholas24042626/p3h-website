@@ -12,7 +12,7 @@ For another port, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\Sta
 
 Programme content comes from the supplied P3H background and bilingual standee. The four support areas use shorter public-facing headings, with application assistance, training, forward care planning, respite and peer support explained on their detail pages.
 
-The 3,000-caregiver figure is a three-year target. The engagement hub, Mobile Respite Team and rewards mechanism are described as programme approaches; contact the team for current arrangements. Weekday staff contact hours are distinguished from the planned 24/7 hub.
+The 3,000-caregiver figure is a three-year target. The engagement hub and Mobile Respite Team are described as programme approaches; contact the team for current arrangements. Weekday staff contact hours are distinguished from the planned 24/7 hub.
 
 The grant acknowledgement links to the official Income announcement:
 https://www.income.com.sg/about-us/corporate-information/press-releases/caregiver-grant
@@ -44,7 +44,7 @@ Serve `p3h-website` as the static site root. No build step is required. Preserve
 
 ## P3H companion chatbot
 
-Every page has an **Ask P3H** button. The responsive chat offers answers about support, eligibility, rewards and contact details, plus three guided tutorials: getting started, finding caregiver support and using digital wellness. Local answers link to the relevant website pages. Unknown questions are referred to the team. Conversations stay in memory and clear on navigation or New chat.
+Every page has an **Ask P3H** button. The responsive chat offers answers about support, eligibility, digital wellness and contact details, plus three guided tutorials: getting started, finding caregiver support and using digital wellness. Local answers link to the relevant website pages. Unknown questions are referred to the team. Conversations stay in memory and clear on navigation or New chat.
 
 The local guide works without credentials, including on static hosting. For AI answers, set `OPENAI_API_KEY` in your server environment and run `Start-Website.ps1` from that same PowerShell session. Set `OPENAI_MODEL` to change the default `gpt-4.1-mini`. Never put a key in HTML, JavaScript or a committed file. The existing double-click launcher also supports an inherited environment key.
 
@@ -60,4 +60,6 @@ Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Chatbot-Api.Tes
 
 ## April 2026 media release update
 
-The supplied media release dated 7 April 2026 is available at assets/documents/p3h-media-release-20260407.pdf. It confirms the 1 April soft launch at GLOW (Nanyang), Healthy-Tec collaboration, home/centre respite, micro jobs, digital wellness categories and Crystal Economy. The published annual caregiver targets sum to 2,800 (700 + 900 + 1,200), replacing the earlier rounded 3,000 figure. Reward details are attributed to the April release; visitors are directed to the team for current arrangements. No GLOW address or installation link was supplied, so these are requested through the team.
+The supplied media release dated 7 April 2026 is available at assets/documents/p3h-media-release-20260407.pdf. It confirms the 1 April soft launch at GLOW (Nanyang), Healthy-Tec collaboration, home/centre respite, micro jobs and digital wellness categories. The published annual caregiver targets sum to 2,800 (700 + 900 + 1,200), replacing the earlier rounded 3,000 figure. No GLOW address or installation link was supplied, so these are requested through the team.
+
+The launch media release is retained as an archival source and is no longer linked from the public resources page because it describes a retired feature.
