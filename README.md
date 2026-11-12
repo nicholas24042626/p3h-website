@@ -10,9 +10,9 @@ For another port, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\Sta
 
 ## Content and sources
 
-Programme content comes from the supplied P3H background and bilingual standee. The four support areas use shorter public-facing headings, with application assistance, training, forward care planning, respite and peer support explained on their detail pages.
+Programme content comes from the supplied P3H background and bilingual standee. The four support areas, financial grants, referral services, training and digital wellness now live together on `assistance.html`.
 
-The 3,000-caregiver figure is a three-year target. The engagement hub and Mobile Respite Team are described as programme approaches; contact the team for current arrangements. Weekday staff contact hours are distinguished from the planned 24/7 hub.
+The current three-year target is 2,800 caregivers, based on the annual targets in the April 2026 media release. Digital activities are available around the clock; staff contact hours and respite arrangements are separate.
 
 The grant acknowledgement links to the official Income announcement:
 https://www.income.com.sg/about-us/corporate-information/press-releases/caregiver-grant
@@ -21,10 +21,11 @@ WhatsApp (6859 1962), email (caregiversupport@tzuchi.org.sg), islandwide coverag
 
 ## Files
 
-- Top-level HTML files contain the public pages.
-- `streams/` contains the four support detail pages.
-- `css/refinements.css` applies the navy-and-cream refinements after existing styles.
-- `js/main.js` controls mobile navigation and active-page indicators.
+- Edit the five canonical pages: `index.html`, `assistance.html`, `activities.html`, `resources.html` and `contact.html`.
+- Other HTML routes, including `streams/`, are generated compatibility copies. Do not edit them directly.
+- `tools/Sync-Layout.ps1` owns primary navigation, the footer, canonical links and compatibility copies. Run it after editing content: `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\Sync-Layout.ps1`.
+- `css/refinements.css` applies the warm orange P3H styling after existing styles.
+- `js/main.js` controls mobile navigation, active-page indicators and support sections with bookmark and browser history support. Without JavaScript, all sections remain readable.
 - FAQs use native HTML disclosure elements and work without JavaScript.
 - `assets/documents/p3h-caregiver-support.pdf` is the original print standee.
 
@@ -36,7 +37,15 @@ WhatsApp (6859 1962), email (caregiversupport@tzuchi.org.sg), islandwide coverag
 - Verified descriptions and URLs for SEEN, GLOW and Longevity Courtyard.
 - Approved external caregiver guides and downloadable resources.
 
-The stories and venues pages explain that details are pending. Add approved content to the existing HTML pages when available. Do not substitute invented testimonials, schedules or eligibility rules.
+Add approved activity content to `activities.html` and confirmed visit arrangements to `contact.html`. Partners and programme background live in the expandable About section on Home. Do not substitute invented testimonials, schedules or eligibility rules.
+
+## Navigation and maintenance
+
+The primary navigation is **Home / Caregiver support / Activities / Resources & FAQs / Contact**. Every page has a visible current-page indicator and a Home link. Support functions are reachable through the Caregiver support page and its five section links. Registration and visit guidance live on Contact; FAQs and downloads live on Resources & FAQs.
+
+See [NAVIGATION-AUDIT.md](NAVIGATION-AUDIT.md) for the original route audit, feature ownership, old URL mapping, journey comparisons and verification results. Old URLs serve complete copies of their canonical workspace without redirect hops. They carry canonical links and `noindex,follow`, and are excluded from chatbot grounding.
+
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Navigation.Tests.ps1` to validate navigation, content retention, local files, fragments and structural nesting. With the local server running, open `/tests/navigation.html` to check in-page sections, bookmarks, Back/Forward history, filters, compatibility routes and responsive navigation. Run the browser checks at desktop and mobile widths.
 
 ## Hosting
 
@@ -48,7 +57,7 @@ Every page has an **Ask P3H** button. The responsive chat offers answers about s
 
 The local guide works without credentials, including on static hosting. For AI answers, set `OPENAI_API_KEY` in your server environment and run `Start-Website.ps1` from that same PowerShell session. Set `OPENAI_MODEL` to change the default `gpt-4.1-mini`. Never put a key in HTML, JavaScript or a committed file. The existing double-click launcher also supports an inherited environment key.
 
-The Windows server exposes `GET /api/chat/status` and `POST /api/chat`. It uses the [OpenAI Responses API](https://developers.openai.com/api/docs/quickstart), sends the last ten chat messages with the question, discovers the website's HTML pages at request time (excluding test fixtures), and supplies page titles, headings, content and link targets as grounded knowledge. This keeps AI answers aligned when website content changes without requiring a separate chatbot index. It sets `store: false`. AI mode displays a notice that questions are sent to OpenAI. No chat history is saved by this website. Provider data handling still applies. An unavailable AI connection falls back to the clearly labelled local guide.
+The Windows server exposes `GET /api/chat/status` and `POST /api/chat`. It uses the [OpenAI Responses API](https://developers.openai.com/api/docs/quickstart), sends the last ten chat messages with the question, discovers the website's canonical HTML pages at request time (excluding test fixtures and compatibility copies), and supplies page titles, headings, content and link targets as grounded knowledge. This keeps AI answers aligned when website content changes without requiring a separate chatbot index. It sets `store: false`. AI mode displays a notice that questions are sent to OpenAI. No chat history is saved by this website. Provider data handling still applies. An unavailable AI connection falls back to the clearly labelled local guide.
 
 The PowerShell server is a loopback-only local preview server. It validates input size and roles, limits AI requests to twelve per minute, and does not serve PowerShell or credential files. It handles requests sequentially. For public AI hosting, implement the same API routes in a production backend with server-side secrets and suitable access and rate controls; static hosting alone provides the local guide.
 

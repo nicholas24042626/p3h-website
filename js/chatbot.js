@@ -2,6 +2,24 @@
   'use strict';
   if (document.querySelector('.p3h-chat')) return;
   const root = new URL('../', document.currentScript.src);
+  const canonicalSources = {
+    'streams/stream-1.html': 'assistance.html#support-1',
+    'streams/stream-2.html': 'assistance.html#support-2',
+    'streams/stream-3.html': 'assistance.html#support-3',
+    'streams/stream-4.html': 'assistance.html#support-4',
+    'how-we-help.html': 'assistance.html#financial-support',
+    'programmes.html': 'assistance.html#training-programmes',
+    'target-groups.html': 'assistance.html#who-we-help',
+    'faq.html': 'resources.html#faqs',
+    'venues.html': 'contact.html#visit',
+    'partners.html': 'index.html#about',
+    'testimonies.html': 'activities.html'
+  };
+  const canonicalSource = path => {
+    const [page, fragment] = path.split('#');
+    const home = canonicalSources[page];
+    return home ? fragment ? `${home.split('#')[0]}#${fragment}` : home : path;
+  };
   const link = document.createElement('link');
   link.rel = 'stylesheet'; link.href = new URL('css/chatbot.css', root); document.head.append(link);
   const topics = [
@@ -85,10 +103,23 @@
       'assistance.html#other-assistance': 'Other Assistance Schemes',
       'contact.html': 'Contact the P3H Team'
     };
-    sources.forEach(path => {
+    [...new Set(sources.map(canonicalSource))].forEach(path => {
       const a = document.createElement('a');
       a.href = new URL(path, root);
-      a.textContent = sources.length === 1 ? `Read ${sourceLabels[path] || 'more on P3H'} →` : `Read ${sourceLabels[path] || path.split('#')[0].replace('.html', '').replace(/-/g, ' ')} →`;
+      const labels = {
+        'assistance.html#support-1': 'Care navigation',
+        'assistance.html#support-2': 'Training & planning',
+        'assistance.html#support-3': 'Respite & self-care',
+        'assistance.html#support-4': 'Peer support',
+        'assistance.html#financial-support': 'Financial grants',
+        'assistance.html#other-assistance': 'Care & daily living',
+        'assistance.html#training-programmes': 'Training',
+        'assistance.html#digital-wellness': 'Digital wellness',
+        'assistance.html#who-we-help': 'Who P3H supports',
+        'resources.html#faqs': 'Resources & FAQs',
+        'contact.html#visit': 'Plan your visit'
+      };
+      a.textContent = `Read ${labels[path] || sourceLabels[path] || path.split('#')[0].replace('.html', '').replace(/-/g, ' ')} →`;
       row.append(a);
     });
     messages.append(row); messages.scrollTop = messages.scrollHeight;

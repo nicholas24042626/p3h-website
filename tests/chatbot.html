@@ -58,9 +58,9 @@
   check('AI failure falls back visibly', $('.chat-messages').textContent.includes('AI is temporarily unavailable'));
   handler = async () => ({ ok: true, json: async () => ({ reply: 'Explore training. Source: streams/stream-2.html' }) });
   await ask('Explain training'); check('AI success', last().includes('Explore training'));
-  check('AI source is clickable', [...document.querySelectorAll('.chat-assistant a')].at(-1).href.endsWith('/streams/stream-2.html'));
+  check('AI source is clickable', [...document.querySelectorAll('.chat-assistant a')].at(-1).href.endsWith('/assistance.html#support-2'));
   handler = async () => ({ ok: true, json: async () => ({ reply: 'Explore grants. Source: how-we-help.html#daily-living' }) });
-  await ask('Explain financial help'); check('New grant page source is clickable', [...document.querySelectorAll('.chat-assistant a')].at(-1).href.endsWith('/how-we-help.html#daily-living'));
+  await ask('Explain financial help'); check('New grant page source is clickable', [...document.querySelectorAll('.chat-assistant a')].at(-1).href.endsWith('/assistance.html#daily-living'));
   check('Conversation context bounded', calls.at(-1).messages.length <= 11);
   check('Local and tutorial context sent to AI', calls.at(-1).messages.some(message => message.role === 'assistant'));
   handler = async () => ({ ok: true, json: async () => ({ reply: ' ' }) });

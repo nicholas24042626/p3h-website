@@ -10,6 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const open = nav.classList.toggle('is-open');
     toggle.setAttribute('aria-expanded', String(open));
   });
+  const revealAnchor = () => {
+    const id = location.hash.slice(1) || document.body.dataset.defaultTarget;
+    const target = id && document.getElementById(decodeURIComponent(id));
+    if (target?.matches('details')) target.open = true;
+    for (let parent = target?.parentElement; parent; parent = parent.parentElement) {
+      if (parent.matches('details')) parent.open = true;
+    }
+  };
+  revealAnchor();
+  window.addEventListener('hashchange', revealAnchor);
+  if (!location.hash && document.body.dataset.defaultTarget) {
+    requestAnimationFrame(() => document.getElementById(document.body.dataset.defaultTarget)?.scrollIntoView());
+  }
   document.querySelectorAll('[data-page-link]').forEach(link => {
     if (link.dataset.pageLink === document.body.dataset.page) {
       link.setAttribute('aria-current', 'page');
@@ -17,8 +30,35 @@ document.addEventListener('DOMContentLoaded', () => {
       if (group && window.innerWidth < 1100) group.open = true;
     }
   });
-  if (document.body.dataset.page?.startsWith('stream-')) {
-    document.querySelector('[data-page-link="assistance"]')?.setAttribute('aria-current', 'page');
+  // Section links work as ordinary anchors without JavaScript. Enhance them into
+  // an in-page workspace while keeping bookmarks and browser history useful.
+  const workspace = document.querySelector('[data-workspace-nav]');
+  if (workspace) {
+    const links = [...workspace.querySelectorAll('a')];
+    const panels = [...document.querySelectorAll('[data-workspace-panel]')];
+    const selectSection = (moveFocus = false) => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      const target = document.getElementById(id);
+      const section = panels.find(panel => panel.id === id || panel.contains(target))
+        || panels.find(panel => panel.id === document.body.dataset.defaultSection)
+        || panels[0];
+      panels.forEach(panel => { panel.hidden = panel !== section; });
+      links.forEach(link => {
+        if (link.hash === `#${section.id}`) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+      const disclosure = target?.closest('details');
+      if (disclosure) disclosure.open = true;
+      if (moveFocus) {
+        const heading = section.querySelector('h2');
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+        section.scrollIntoView({ block: 'start' });
+      }
+    };
+    workspace.classList.add('is-enhanced');
+    window.addEventListener('hashchange', () => selectSection(true));
+    selectSection();
   }
   document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;

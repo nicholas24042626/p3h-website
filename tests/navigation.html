@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Navigation regression checks</title></head>
+<body><h1>Navigation regression checks</h1><pre id="results">Running...</pre><iframe title="Website under test" style="width:100%;height:850px;border:0"></iframe>
+<script>
+(async () => {
+  const results = [], frame = document.querySelector('iframe');
+  const options = new URLSearchParams(location.search);
+  if (options.get('width')) frame.style.width = `${Number(options.get('width'))}px`;
+  const check = (name, value) => {
+    results.push(`${value ? 'PASS' : 'FAIL'}: ${name}`);
+    document.querySelector('#results').textContent = results.join('\n');
+  };
+  let visit = 0;
+  const tick = () => new Promise(resolve => setTimeout(resolve, 100));
+  async function load(path) {
+    const [page, hash] = path.split('#');
+    await new Promise(resolve => { frame.onload = resolve; frame.src = `../${page}?navigation-check=${++visit}${hash ? '#' + hash : ''}`; });
+    await tick();
+    return frame.contentDocument;
+  }
+  let doc = await load('assistance.html');
+  if (options.has('preview')) {
+    document.querySelector('h1').hidden = true;
+    document.querySelector('#results').hidden = true;
+    document.body.style.margin = '0';
+    frame.style.display = 'block';
+    return;
+  }
+  check('Requested mobile viewport is exact', !options.get('width') || frame.contentWindow.innerWidth === Number(options.get('width')));
+  check('Default support section is visible', !doc.querySelector('#support-options').hidden);
+  check('Only one section visible', doc.querySelectorAll('[data-workspace-panel]:not([hidden])').length === 1);
+  doc.querySelector('[href="#financial-support"]').click(); await tick();
+  check('Grants switch in place', !doc.querySelector('#financial-support').hidden && doc.querySelector('#support-options').hidden);
+  check('Selected section marked', doc.querySelector('[href="#financial-support"]').getAttribute('aria-current') === 'location');
+  check('Section heading receives focus', doc.activeElement.id === 'heading-financial-support');
+  doc.querySelector('[data-grant-filter="training"]').click();
+  check('Grant filter shows training grants', [...doc.querySelectorAll('.grant-card')].filter(card => !card.hidden).length === 2);
+  frame.contentWindow.history.back(); await tick();
+  check('Browser back restores section', !doc.querySelector('#support-options').hidden);
+  frame.contentWindow.history.forward(); await tick();
+  check('Browser forward restores grants', !doc.querySelector('#financial-support').hidden);
+  doc.querySelector('[href="#other-assistance"]').click(); await tick();
+  doc.querySelector('[data-scheme-filter="food"]').click();
+  check('Services filter remains independent', [...doc.querySelectorAll('.scheme-card')].filter(card => !card.hidden).length === 2);
+  for (const id of ['daily-living', 'training-programmes', 'digital-wellness', 'support-3', 'who-we-help']) {
+    doc = await load(`assistance.html#${id}`);
+    const target = doc.getElementById(id);
+    check(`Bookmark ${id} reveals its section`, !target.closest('[data-workspace-panel]').hidden);
+    if (target.matches('details')) check(`Bookmark ${id} expands content`, target.open);
+  }
+  for (const [path, id] of [['how-we-help.html', 'financial-support'], ['programmes.html#digital-wellness', 'digital-wellness'], ['streams/stream-2.html', 'support-2']]) {
+    doc = await load(path);
+    check(`Old URL ${path} displays relevant content`, !doc.getElementById(id).closest('[data-workspace-panel]').hidden);
+    check(`Old URL ${path} has canonical navigation`, doc.querySelectorAll('.main-nav a').length === 5);
+  }
+  doc = await load('index.html#about');
+  check('About bookmark opens partner details', doc.querySelector('#about').open);
+  for (const page of ['index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html']) {
+    doc = await load(page);
+    check(`${page} fits viewport`, doc.documentElement.scrollWidth <= frame.contentWindow.innerWidth + 1);
+    check(`${page} highlights one destination`, doc.querySelectorAll('.main-nav [aria-current="page"]').length === 1);
+    if (frame.contentWindow.innerWidth < 1100) {
+      const toggle = doc.querySelector('.menu-toggle'); toggle.click();
+      check(`${page} mobile menu opens`, toggle.getAttribute('aria-expanded') === 'true');
+      doc.dispatchEvent(new frame.contentWindow.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      check(`${page} Escape closes mobile menu`, toggle.getAttribute('aria-expanded') === 'false');
+    }
+  }
+  document.querySelector('#results').textContent = results.join('\n') + `\n\n${results.filter(result => result.startsWith('PASS')).length}/${results.length} passed`;
+  document.title = results.some(result => result.startsWith('FAIL')) ? 'FAIL: P3H navigation' : 'PASS: P3H navigation';
+})().catch(error => { document.querySelector('#results').textContent = 'FAIL: ' + error.stack; document.title = 'FAIL: P3H navigation'; });
+</script></body></html>
