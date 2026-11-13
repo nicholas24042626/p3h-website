@@ -34,7 +34,7 @@ foreach ($page in $pages) {
         if ($m.Groups[2].Success) { $destination = $destination.Split('#')[0] + $m.Groups[2].Value }
         return 'href="' + $destination + '"'
     })
-    # Within a workspace, switch sections without loading the document again.
+    # Preserve section fragments, including when opened in a separate tab.
     $html = $html.Replace("href=`"$page#", 'href="#')
     $current = [regex]::Match($html, '<body data-page="([^"]+)"').Groups[1].Value
     $links = foreach ($item in $destinations) {
@@ -55,6 +55,18 @@ foreach ($page in $pages) {
 </div><div class="container footer-bottom"><small>Practical help, room to recharge and a community that understands.</small></div></footer>
 '@
     $html = [regex]::Replace($html, '(?s)<footer class="site-footer">.*?</footer>', [Text.RegularExpressions.MatchEvaluator]{ param($m) $footer })
+    $html = [regex]::Replace($html, '<a\b[^>]*\bhref="[^"]*"[^>]*>', [Text.RegularExpressions.MatchEvaluator]{
+        param($m)
+        $anchor = [regex]::Replace($m.Value, '\s+(target|rel)="[^"]*"', '')
+        # Buttons, brand/home navigation and in-page actions stay in this tab.
+        if ($anchor -match 'class="[^"]*\b(button|brand|skip-link)\b' -or $anchor -match 'data-page-link=|href="#') { return $anchor }
+        return $anchor.TrimEnd('>') + ' target="_blank" rel="noopener noreferrer">'
+    })
+    # Navigation containers are controls even when their items look like text links.
+    $html = [regex]::Replace($html, '(?s)<(nav|header|footer)\b[^>]*>.*?</\1>', [Text.RegularExpressions.MatchEvaluator]{
+        param($m)
+        return [regex]::Replace($m.Value, '(<a\b[^>]*?)(\s+(?:target|rel)="[^"]*")', '$1') -replace '\s+rel="noopener noreferrer"', ''
+    })
     [IO.File]::WriteAllText($path, $html, $utf8)
 }
 # Old URLs serve the same complete workspace, without redirect-only pages or a

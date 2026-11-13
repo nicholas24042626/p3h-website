@@ -106,6 +106,8 @@
     [...new Set(sources.map(canonicalSource))].forEach(path => {
       const a = document.createElement('a');
       a.href = new URL(path, root);
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
       const labels = {
         'assistance.html#support-1': 'Care navigation',
         'assistance.html#support-2': 'Training & planning',

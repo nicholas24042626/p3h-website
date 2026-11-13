@@ -43,6 +43,8 @@ Add approved activity content to `activities.html` and confirmed visit arrangeme
 
 The primary navigation is **Home / Caregiver support / Activities / Resources & FAQs / Contact**. Every page has a visible current-page indicator and a Home link. Support functions are reachable through the Caregiver support page and its five section links. Registration and visit guidance live on Contact; FAQs and downloads live on Resources & FAQs.
 
+Regular text hyperlinks and chatbot source links open a new tab with `noopener noreferrer`. Navigation menus, section links, buttons, the brand link and Skip to content stay in the current tab. Browsers may hand email or messaging links to the visitor's configured application.
+
 See [NAVIGATION-AUDIT.md](NAVIGATION-AUDIT.md) for the original route audit, feature ownership, old URL mapping, journey comparisons and verification results. Old URLs serve complete copies of their canonical workspace without redirect hops. They carry canonical links and `noindex,follow`, and are excluded from chatbot grounding.
 
 Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Navigation.Tests.ps1` to validate navigation, content retention, local files, fragments and structural nesting. With the local server running, open `/tests/navigation.html` to check in-page sections, bookmarks, Back/Forward history, filters, compatibility routes and responsive navigation. Run the browser checks at desktop and mobile widths.

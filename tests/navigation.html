@@ -29,6 +29,7 @@
   check('Requested mobile viewport is exact', !options.get('width') || frame.contentWindow.innerWidth === Number(options.get('width')));
   check('Default support section is visible', !doc.querySelector('#support-options').hidden);
   check('Only one section visible', doc.querySelectorAll('[data-workspace-panel]:not([hidden])').length === 1);
+  check('Navigation and buttons stay in the current tab', [...doc.querySelectorAll('nav a, .button, .brand, .skip-link')].every(link => !link.target));
   doc.querySelector('[href="#financial-support"]').click(); await tick();
   check('Grants switch in place', !doc.querySelector('#financial-support').hidden && doc.querySelector('#support-options').hidden);
   check('Selected section marked', doc.querySelector('[href="#financial-support"]').getAttribute('aria-current') === 'location');
