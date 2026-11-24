@@ -1,0 +1,18 @@
+/* Caregiver Resources directory page. Follows the site's card, filter
+   and category conventions from assistance.html / refinements.css. */
+.resource-search { margin-bottom: 1rem; }
+.resource-search label { margin-bottom: .35rem; }
+.resource-filters { margin-top: 0; }
+.resource-category + .resource-category { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.resource-category > h2 { font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin-bottom: 0; }
+.resource-count { font-size: .85rem; color: var(--muted); font-weight: 600; }
+.resource-grid { margin-top: 1.5rem; }
+.resource-card { display: flex; flex-direction: column; align-items: flex-start; }
+.resource-card .eyebrow { margin-bottom: .5rem; }
+.resource-card h3 { font-size: 1.2rem; margin: 0 0 .5rem; }
+.resource-card p { font-size: .95rem; }
+.resource-card > a:last-child { margin-top: auto; padding-top: .5rem; font-size: .9rem; color: var(--orange-dark); font-weight: 600; }
+.caregiver-resources-teaser .scheme-key { margin: 1rem 0; }
+.caregiver-resources-teaser .scheme-filter { border-color: var(--line); background: var(--white); text-decoration: none; }
+.caregiver-resources-teaser .scheme-filter:hover { border-color: var(--orange-dark); background: var(--peach); }
+.caregiver-resources-teaser .button { margin-top: .25rem; }
