@@ -33,23 +33,26 @@
 <label for="resource-search">Search resources</label>
 <input type="search" id="resource-search" placeholder="Search resources" autocomplete="off">
 </div>
-<ul class="scheme-key resource-filters" id="resource-filters">
-<li><button class="scheme-filter is-active" type="button" data-resource-filter="all" aria-pressed="true">All resources &middot; 94</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="healthy-ageing" aria-pressed="false">Healthy Ageing &middot; 8</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="well-being" aria-pressed="false">Caregiver Well-Being &amp; Self Care &middot; 10</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="support-groups" aria-pressed="false">Support Groups &amp; Community Services &middot; 5</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="care-services" aria-pressed="false">Care Services &amp; Practical Support &middot; 6</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="skills-training" aria-pressed="false">Caregiving Skills &amp; Training &middot; 10</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="counselling" aria-pressed="false">Counselling Services &middot; 5</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="financial" aria-pressed="false">Financial Assistance &amp; Grants &middot; 8</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="conditions" aria-pressed="false">Conditions &amp; Disabilities &middot; 11</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="assistive-tech" aria-pressed="false">Assistive Devices &amp; Technology &middot; 7</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="home-safety" aria-pressed="false">Home Safety &middot; 5</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="respite" aria-pressed="false">Respite Care &middot; 4</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="future-legacy" aria-pressed="false">Future &amp; Legacy Planning &middot; 6</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="end-of-life" aria-pressed="false">End-of-Life Care &middot; 4</button></li>
-<li><button class="scheme-filter" type="button" data-resource-filter="work-employment" aria-pressed="false">Work &amp; Employment Support &middot; 5</button></li>
-</ul>
+<div class="resource-filter-row">
+<label for="resource-category">Filter by category</label>
+<select id="resource-category">
+<option value="all">All resources &middot; 94</option>
+<option value="healthy-ageing">Healthy Ageing &middot; 8</option>
+<option value="well-being">Caregiver Well-Being &amp; Self Care &middot; 10</option>
+<option value="support-groups">Support Groups &amp; Community Services &middot; 5</option>
+<option value="care-services">Care Services &amp; Practical Support &middot; 6</option>
+<option value="skills-training">Caregiving Skills &amp; Training &middot; 10</option>
+<option value="counselling">Counselling Services &middot; 5</option>
+<option value="financial">Financial Assistance &amp; Grants &middot; 8</option>
+<option value="conditions">Conditions &amp; Disabilities &middot; 11</option>
+<option value="assistive-tech">Assistive Devices &amp; Technology &middot; 7</option>
+<option value="home-safety">Home Safety &middot; 5</option>
+<option value="respite">Respite Care &middot; 4</option>
+<option value="future-legacy">Future &amp; Legacy Planning &middot; 6</option>
+<option value="end-of-life">End-of-Life Care &middot; 4</option>
+<option value="work-employment">Work &amp; Employment Support &middot; 5</option>
+</select>
+</div>
 <p class="contact-note" id="resource-status" role="status">Showing all 94 resources in 14 categories.</p>
 <section class="resource-category" id="cat-healthy-ageing" data-category="healthy-ageing" aria-labelledby="heading-healthy-ageing">
 <h2 id="heading-healthy-ageing">Healthy Ageing <span class="resource-count">8</span></h2>
@@ -699,6 +702,7 @@
 </div>
 </article>
 <article class="card resource-card" data-search="imda mobile access for seniors subsidised smartphone (from $20) and a 2-year mobile plan at $5.10 a month for lower-income seniors aged 60 and above, so they can stay connected and go digital.">
+<div class="resource-logo"><img src="https://www.imda.gov.sg/assets/45d45448-2de8-424a-ae25-cf45b181e3d9" alt="" loading="lazy" onerror="this.parentElement.remove()"></div>
 <div class="resource-card-body">
 <p class="eyebrow">IMDA</p>
 <h3>Mobile Access for Seniors</h3>
@@ -707,6 +711,7 @@
 </div>
 </article>
 <article class="card resource-card" data-search="imda digitalaccess@home subsidised home wi-fi (from $5 a month) and a laptop or tablet for lower-income households, so the whole family can get online at home.">
+<div class="resource-logo"><img src="https://www.imda.gov.sg/assets/45d45448-2de8-424a-ae25-cf45b181e3d9" alt="" loading="lazy" onerror="this.parentElement.remove()"></div>
 <div class="resource-card-body">
 <p class="eyebrow">IMDA</p>
 <h3>DigitalAccess@Home</h3>
@@ -975,7 +980,7 @@
 (function () {
   var PAGE_SIZE = 9;
   var search = document.getElementById('resource-search');
-  var filters = document.querySelectorAll('[data-resource-filter]');
+  var categorySelect = document.getElementById('resource-category');
   var status = document.getElementById('resource-status');
   var empty = document.getElementById('resource-empty');
   var pager = document.getElementById('resource-pagination');
@@ -994,7 +999,7 @@
       btn.addEventListener('click', function () {
         currentPage = page;
         apply();
-        document.getElementById('resource-filters').scrollIntoView({ block: 'start' });
+        categorySelect.scrollIntoView({ block: 'start' });
       });
       return btn;
     };
@@ -1035,11 +1040,7 @@
   function selectCategory(id, scroll) {
     activeCategory = id;
     currentPage = 1;
-    filters.forEach(function (button) {
-      var selected = button.dataset.resourceFilter === id;
-      button.classList.toggle('is-active', selected);
-      button.setAttribute('aria-pressed', String(selected));
-    });
+    categorySelect.value = id;
     apply();
     if (scroll) {
       var target = document.getElementById('cat-' + id);
@@ -1047,9 +1048,7 @@
     }
   }
   search.addEventListener('input', function () { currentPage = 1; apply(); });
-  filters.forEach(function (button) {
-    button.addEventListener('click', function () { selectCategory(button.dataset.resourceFilter, true); });
-  });
+  categorySelect.addEventListener('change', function () { selectCategory(categorySelect.value, true); });
   var hashCategory = decodeURIComponent(location.hash.slice(1)).replace(/^cat-/, '');
   if (hashCategory && document.getElementById('cat-' + hashCategory)) selectCategory(hashCategory, false);
   else apply();
