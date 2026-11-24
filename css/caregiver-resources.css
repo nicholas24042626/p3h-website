@@ -2,10 +2,8 @@
    and category conventions from assistance.html / refinements.css. */
 .resource-search { margin-bottom: 1rem; }
 .resource-search label { margin-bottom: .35rem; }
-.scheme-key.resource-filters { gap: .5rem; margin-top: 0; }
-.resource-filters .scheme-filter { border-color: var(--line); background: var(--white); color: var(--ink); }
-.resource-filters .scheme-filter:hover, .resource-filters .scheme-filter:focus-visible { border-color: var(--orange-dark); background: var(--white); color: var(--ink); }
-.resource-filters .scheme-filter.is-active { border-color: var(--blue-900); background: var(--blue-900); color: var(--white); }
+.resource-filter-row { margin-bottom: 1rem; }
+.resource-filter-row label { margin-bottom: .35rem; }
 .resource-category + .resource-category { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
 .resource-category > h2 { font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin-bottom: 0; }
 .resource-count { font-size: .85rem; color: var(--muted); font-weight: 600; }
