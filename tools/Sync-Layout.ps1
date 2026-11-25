@@ -9,7 +9,7 @@ $destinations = @(
     @('resources', 'resources.html', 'Resources &amp; FAQs'),
     @('contact', 'contact.html', 'Contact')
 )
-$pages = @('index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html')
+$pages = @('index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html')
 $routeHomes = @{
     'how-we-help.html' = 'assistance.html#financial-support'
     'programmes.html' = 'assistance.html#training-programmes'
@@ -26,6 +26,7 @@ $routeHomes = @{
 foreach ($page in $pages) {
     $path = Join-Path $root $page
     $html = [IO.File]::ReadAllText($path)
+    $html = $html.Replace('<html lang="en">', '<html lang="en-SG">')
     $html = [regex]::Replace($html, 'href="(?:\.\./)?([^"#]+)(#[^"]*)?"', [Text.RegularExpressions.MatchEvaluator]{
         param($m)
         $route = $m.Groups[1].Value
@@ -44,17 +45,30 @@ foreach ($page in $pages) {
     }
     $nav = '<nav class="main-nav" id="main-nav" aria-label="Main navigation"><ul>' + ($links -join "`n") + '</ul></nav>'
     $html = [regex]::Replace($html, '(?s)<nav class="main-nav".*?</nav>', [Text.RegularExpressions.MatchEvaluator]{ param($m) $nav })
-    $html = [regex]::Replace($html, '<title>.*?</title>', "<title>$($destinations.Where({ $_[1] -eq $page })[0][2]) | P3H</title>")
+    $title = if ($page -eq 'caregiving-journey.html') { 'Your caregiving journey' } else { $destinations.Where({ $_[1] -eq $page })[0][2] }
+    $html = [regex]::Replace($html, '<title>.*?</title>', "<title>$title | P3H</title>")
     $html = [regex]::Replace($html, '<link rel="canonical"[^>]*>\s*', '')
     $html = $html.Replace('</head>', "<link rel=`"canonical`" href=`"$page`">`n</head>")
     $footer = @'
 <footer class="site-footer"><div class="container footer-grid">
 <div><h2>P3H</h2><p>Humanistic Hands and Heart.<br>A caregiver support programme by Tzu Chi Singapore.</p></div>
-<div><h3>Care for the caregiver</h3><p>Supporting youth and adult caregivers in Singapore.</p></div>
+<div><h3>Care for the caregiver</h3><p>Support for different stages of caring.</p><a href="caregiving-journey.html">Your caregiving journey</a><br><a href="caregiving-journey.html#young-caregivers">Young caregivers</a></div>
 <div><h3>Speak with the team</h3><p>Monday to Friday, 9am&ndash;5pm</p><a href="contact.html">Contact &amp; registration &rarr;</a></div>
 </div><div class="container footer-bottom"><small>Practical help, room to recharge and a community that understands.</small></div></footer>
 '@
     $html = [regex]::Replace($html, '(?s)<footer class="site-footer">.*?</footer>', [Text.RegularExpressions.MatchEvaluator]{ param($m) $footer })
+    # Also match a previously synchronised footer with its language attribute.
+    $html = [regex]::Replace($html, '(?s)<footer class="site-footer" lang="en">.*?</footer>', [Text.RegularExpressions.MatchEvaluator]{ param($m) $footer })
+    $readingTools = @'
+<aside class="reading-tools" aria-label="Reading options"><div class="container reading-tools-inner">
+<div class="language-options" data-site-language-controls hidden role="group" aria-label="Website language"><button type="button" data-language-button="en" lang="en-SG" aria-pressed="true">English</button><button type="button" data-language-button="zh" lang="zh-Hans-SG" aria-pressed="false">&#20013;&#25991;</button></div>
+<div class="reading-controls" data-reading-controls hidden><span>Text size</span><button type="button" data-text-size="standard" aria-pressed="true">Standard</button><button type="button" data-text-size="large" aria-pressed="false">Larger</button><button type="button" data-print>Print this page</button></div>
+</div></aside>
+'@
+    $html = [regex]::Replace($html, '(?s)<aside class="reading-tools".*?</aside>\s*', '')
+    $html = $html.Replace('</header>', "</header>`n$readingTools")
+    if ($html -notmatch 'css/accessibility.css') { $html = $html.Replace('</head>', "<link rel=`"stylesheet`" href=`"css/accessibility.css`">`n</head>") }
+    if ($html -notmatch 'js/i18n.js') { $html = $html.Replace('<script src="js/main.js"', "<script src=`"js/translations.js`"></script>`n<script src=`"js/i18n.js`"></script>`n<script src=`"js/main.js`"") }
     $html = [regex]::Replace($html, '<a\b[^>]*\bhref="[^"]*"[^>]*>', [Text.RegularExpressions.MatchEvaluator]{
         param($m)
         $anchor = [regex]::Replace($m.Value, '\s+(target|rel)="[^"]*"', '')
@@ -97,4 +111,4 @@ foreach ($alias in $aliases) {
     }
     [IO.File]::WriteAllText((Join-Path $root $alias[0]), $html, $utf8)
 }
-Write-Output 'Updated five canonical pages and eleven compatibility routes.'
+Write-Output 'Updated six canonical pages and eleven compatibility routes.'

@@ -14,11 +14,11 @@
   const tick = () => new Promise(resolve => setTimeout(resolve, 100));
   async function load(path) {
     const [page, hash] = path.split('#');
-    await new Promise(resolve => { frame.onload = resolve; frame.src = `../${page}?navigation-check=${++visit}${hash ? '#' + hash : ''}`; });
+    await new Promise(resolve => { frame.onload = resolve; frame.src = `../${page}${page.includes('?') ? '&' : '?'}navigation-check=${++visit}${hash ? '#' + hash : ''}`; });
     await tick();
     return frame.contentDocument;
   }
-  let doc = await load('assistance.html');
+  let doc = await load('assistance.html?lang=en');
   if (options.has('preview')) {
     document.querySelector('h1').hidden = true;
     document.querySelector('#results').hidden = true;
@@ -43,20 +43,20 @@
   doc.querySelector('[href="#other-assistance"]').click(); await tick();
   doc.querySelector('[data-scheme-filter="food"]').click();
   check('Services filter remains independent', [...doc.querySelectorAll('.scheme-card')].filter(card => !card.hidden).length === 2);
-  for (const id of ['daily-living', 'training-programmes', 'digital-wellness', 'support-3', 'who-we-help']) {
+  for (const id of ['daily-living', 'training-programmes', 'support-3', 'who-we-help']) {
     doc = await load(`assistance.html#${id}`);
     const target = doc.getElementById(id);
     check(`Bookmark ${id} reveals its section`, !target.closest('[data-workspace-panel]').hidden);
     if (target.matches('details')) check(`Bookmark ${id} expands content`, target.open);
   }
-  for (const [path, id] of [['how-we-help.html', 'financial-support'], ['programmes.html#digital-wellness', 'digital-wellness'], ['streams/stream-2.html', 'support-2']]) {
+  for (const [path, id] of [['how-we-help.html', 'financial-support'], ['programmes.html#training-programmes', 'training-programmes'], ['streams/stream-2.html', 'support-2']]) {
     doc = await load(path);
     check(`Old URL ${path} displays relevant content`, !doc.getElementById(id).closest('[data-workspace-panel]').hidden);
     check(`Old URL ${path} has canonical navigation`, doc.querySelectorAll('.main-nav a').length === 5);
   }
   doc = await load('index.html#about');
   check('About bookmark opens partner details', doc.querySelector('#about').open);
-  for (const page of ['index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html']) {
+  for (const page of ['index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html']) {
     doc = await load(page);
     check(`${page} fits viewport`, doc.documentElement.scrollWidth <= frame.contentWindow.innerWidth + 1);
     check(`${page} highlights one destination`, doc.querySelectorAll('.main-nav [aria-current="page"]').length === 1);
@@ -67,6 +67,29 @@
       check(`${page} Escape closes mobile menu`, toggle.getAttribute('aria-expanded') === 'false');
     }
   }
+  doc = await load('caregiving-journey.html?lang=zh#young-caregivers');
+  check('Chinese deep link selects Chinese', doc.documentElement.lang === 'zh-Hans-SG' && !doc.querySelector('#young-caregivers [data-language="zh"]').hidden);
+  const bookmarkedSection = doc.querySelector('#young-caregivers').getBoundingClientRect();
+  check('Chinese bookmark scrolls to the requested stage', bookmarkedSection.top >= 0 && bookmarkedSection.top < frame.contentWindow.innerHeight / 2);
+  check('Shared Chinese language button has correct encoding', doc.querySelector('[data-language-button="zh"]').textContent === '\u4e2d\u6587');
+  check('Inactive language is hidden', [...doc.querySelectorAll('[data-language="en"]')].every(node => node.hidden));
+  doc.querySelector('[data-language-button="en"]').click();
+  check('Language switch preserves section bookmark', frame.contentWindow.location.hash === '#young-caregivers' && frame.contentWindow.location.search.includes('lang=en'));
+  check('Language switch updates screen-reader language', doc.documentElement.lang === 'en-SG');
+  doc.querySelector('[data-text-size="large"]').click();
+  check('Larger text changes computed body size', parseFloat(frame.contentWindow.getComputedStyle(doc.body).fontSize) > 20);
+  check('Larger text fits viewport', doc.documentElement.scrollWidth <= frame.contentWindow.innerWidth + 1);
+  doc = await load('resources.html');
+  check('Text preference persists between pages', doc.documentElement.dataset.textSize === 'large');
+  check('Larger resources page fits viewport', doc.documentElement.scrollWidth <= frame.contentWindow.innerWidth + 1);
+  const detail = doc.querySelector('details');
+  detail.open = false;
+  frame.contentWindow.dispatchEvent(new frame.contentWindow.Event('beforeprint'));
+  check('Printing expands FAQs', [...doc.querySelectorAll('main details')].every(node => node.open));
+  frame.contentWindow.dispatchEvent(new frame.contentWindow.Event('afterprint'));
+  check('Printing restores collapsed FAQs', !detail.open);
+  doc.querySelector('[data-text-size="standard"]').click();
+  frame.contentWindow.localStorage.removeItem('p3h-language');
   document.querySelector('#results').textContent = results.join('\n') + `\n\n${results.filter(result => result.startsWith('PASS')).length}/${results.length} passed`;
   document.title = results.some(result => result.startsWith('FAIL')) ? 'FAIL: P3H navigation' : 'PASS: P3H navigation';
 })().catch(error => { document.querySelector('#results').textContent = 'FAIL: ' + error.stack; document.title = 'FAIL: P3H navigation'; });

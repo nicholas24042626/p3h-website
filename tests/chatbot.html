@@ -64,7 +64,7 @@
   check('Conversation context bounded', calls.at(-1).messages.length <= 11);
   check('Local and tutorial context sent to AI', calls.at(-1).messages.some(message => message.role === 'assistant'));
   handler = async () => ({ ok: true, json: async () => ({ reply: ' ' }) });
-  await ask('Digital wellness'); check('Empty AI reply falls back', last().includes('mindfulness'));
+  await ask('Respite'); check('Empty AI reply falls back', last().includes('short-term respite'));
   handler = options => new Promise((resolve, reject) => { options.signal.addEventListener('abort', () => reject(new Error('Aborted'))); });
   $('.chat-form input').value = 'pending question'; $('.chat-form').dispatchEvent(new Event('submit', { cancelable: true }));
   check('Send disabled while waiting', $('[type="submit"]').disabled);

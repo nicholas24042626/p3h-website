@@ -20,10 +20,17 @@
   --radius: 16px;
   --shadow: 0 12px 30px rgba(18, 59, 93, .10);
   --font: "Segoe UI", Arial, sans-serif;
+  --content-width: 1200px;
+  --page-gutter: 1.5rem;
+  --card-padding: 1.75rem;
+  --grid-gap: 1.5rem;
+  --section-padding: clamp(2.5rem, 5vw, 4rem);
+  --card-title-size: 1.25rem;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; color: var(--ink); background: #f7f9fb; font: 17px/1.7 var(--font); }
+body { margin: 0; color: var(--ink); background: #f7f9fb; font: 1.0625rem/1.7 var(--font); }
+button, input, select, textarea { font-family: inherit; }
 img { max-width: 100%; height: auto; }
 a { color: var(--blue-900); }
 a:hover { color: var(--coral); }
@@ -31,7 +38,7 @@ a:hover { color: var(--coral); }
 h1, h2, h3 { line-height: 1.2; color: var(--blue-900); }
 h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); letter-spacing: -.035em; margin: 0 0 var(--space-2); }
 h2 { font-size: clamp(1.65rem, 3vw, 2.35rem); letter-spacing: -.025em; margin: 0 0 var(--space-3); }
-h3 { font-size: 1.35rem; }
+h3 { font-size: 1.35rem; margin: 0 0 var(--space-2); }
 p { margin: 0 0 var(--space-2); }
 .placeholder { background: #eef2f5; border-radius: 5px; padding: .1em .4em; color: #596976; font-size: .9em; }
 .skip-link { position: absolute; left: -9999px; top: 0; z-index: 10; background: var(--white); padding: var(--space-2); }

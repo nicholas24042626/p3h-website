@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-SG">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,9 +7,10 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/refinements.css">
 <link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/refinements.css">
 <meta name="description" content="P3H supports youth and adult caregivers in Singapore with care navigation, training, respite and peer support.">
+<link rel="stylesheet" href="css/accessibility.css">
 <link rel="canonical" href="index.html">
 </head>
 <body data-page="home">
@@ -18,7 +19,7 @@
 <div class="header-inner">
 <a class="brand" href="index.html">
 <img class="p3h-logo" src="assets/images/p3h%20logo.png" alt="P3H - Humanistic Hands and Heart" width="1254" height="1254">
-<span class="programme-brand"><img src="assets/images/tzuchi%20logo.png" alt="Tzu Chi Singapore" width="613" height="139"></span>
+<span class="programme-brand"><img src="assets/images/tzu-chi-foundation.png" alt="Tzu Chi Foundation" width="1254" height="1254"></span>
 </a>
 <button class="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
 <nav class="main-nav" id="main-nav" aria-label="Main navigation"><ul><li><a data-page-link="home" href="index.html" aria-current="page">Home</a></li>
@@ -28,11 +29,24 @@
 <li><a class="nav-contact" data-page-link="contact" href="contact.html">Contact</a></li></ul></nav>
 </div>
 </header>
+<aside class="reading-tools" aria-label="Reading options"><div class="container reading-tools-inner">
+<div class="language-options" data-site-language-controls hidden role="group" aria-label="Website language"><button type="button" data-language-button="en" lang="en-SG" aria-pressed="true">English</button><button type="button" data-language-button="zh" lang="zh-Hans-SG" aria-pressed="false">&#20013;&#25991;</button></div>
+<div class="reading-controls" data-reading-controls hidden><span>Text size</span><button type="button" data-text-size="standard" aria-pressed="true">Standard</button><button type="button" data-text-size="large" aria-pressed="false">Larger</button><button type="button" data-print>Print this page</button></div>
+</div></aside>
 <main id="main">
 <section class="home-banner" aria-labelledby="home-title"><div class="container banner-layout">
-<div class="banner-copy"><p class="eyebrow">Humanistic Hands and Heart</p><h1 id="home-title">You care for others.<br><span>Let us care for you.</span></h1><p lang="zh-Hans" class="banner-chinese">照顾他人，也照顾自己</p><p>Practical help, time to recharge and a community that understands. Supporting youth and adult caregivers in Singapore.</p><div class="button-row"><a class="button" href="assistance.html">Find your support</a><a class="button button-secondary" href="contact.html">Talk to our team</a></div></div>
+<div class="banner-copy"><p class="eyebrow">Humanistic Hands and Heart</p><h1 id="home-title">You care for others.<br><span>Let us care for you.</span></h1><p>Practical help, time to recharge and a community that understands. Supporting youth and adult caregivers in Singapore.</p><div class="button-row"><a class="button" href="assistance.html">Find your support</a><a class="button button-secondary" href="contact.html">Talk to our team</a></div></div>
 </div></section>
-<nav class="home-shortcuts" aria-label="Explore P3H"><div class="container"><a href="#find-support">Find caregiver support</a><a href="#wellbeing">Make time for yourself</a><a href="#community">Connect with our community</a><a href="contact.html">Get in touch</a></div></nav>
+<nav class="home-shortcuts" aria-label="Explore P3H"><div class="container"><a href="#find-support">Find caregiver support</a><a href="#community">Connect with our community</a><a href="contact.html">Get in touch</a></div></nav>
+<section class="journey-start" id="caregiving-journey" aria-labelledby="journey-start-title"><div class="container">
+<div class="section-heading"><p class="eyebrow">Wherever you are in your journey</p><h2 id="journey-start-title">Where would you like to start?</h2><p>Preparing to care, managing today, or adjusting to a new chapter? Find guidance for your stage.</p><a href="caregiving-journey.html" target="_blank" rel="noopener noreferrer">Read the caregiving guide</a></div>
+<div class="grid grid-3">
+<article class="card journey-card"><h3>Preparing to care</h3><p>I may become a caregiver. Help me understand where to begin and who can support me.</p><a class="button button-secondary" href="caregiving-journey.html#preparing">Prepare for caregiving</a></article>
+<article class="card journey-card"><h3>Caring now</h3><p>I am looking after someone. Help me find practical support and room for myself.</p><a class="button button-secondary" href="caregiving-journey.html#caring-now">Find help for today</a></article>
+<article class="card journey-card"><h3>Life after caregiving</h3><p>My caring role has changed or ended. Help me find support for this next chapter.</p><a class="button button-secondary" href="caregiving-journey.html#after-caregiving">Explore life after caring</a></article>
+</div>
+<div class="journey-young"><h3>Balancing care with growing up?</h3><p>If you help care for someone while managing school, work or friendships, there is a place for your needs too. <a href="caregiving-journey.html#young-caregivers" target="_blank" rel="noopener noreferrer">Explore guidance for young caregivers</a>.</p></div>
+</div></section>
 <section class="home-section home-intro"><div class="container"><p class="eyebrow">Who we are</p><h2>Here for your caregiving journey</h2><p>P3H brings practical resources, training, respite and peer support together, so you can care for your loved ones and yourself. Wherever you are in your journey, you don&rsquo;t have to do it alone.</p><a class="intro-link" href="#about">Get to know P3H &amp; our partners</a></div></section>
 <section class="home-section support-paths" id="find-support"><div class="container"><div class="home-heading"><p class="eyebrow">A place to start</p><h2>What would help you today?</h2><p>Choose what you need and explore the support available to you.</p></div><div class="path-grid">
 <a class="button path-card" href="assistance.html#support-1"><span class="path-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m24 5 15 7v12c0 10-15 18-15 18S9 34 9 24V12Z"/><path d="M17 24h14M24 17v14"/></svg></span><h3>Find practical help</h3><p>Care navigation, financial assistance and help with applications.</p><span class="path-label">Explore care support</span></a>
@@ -40,17 +54,13 @@
 <a class="button path-card" href="assistance.html#support-3"><span class="path-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 39S5 28 5 16c0-10 14-12 19-3 5-9 19-7 19 3 0 12-19 23-19 23Z"/><path d="M12 24h8l3-7 5 13 3-6h6"/></svg></span><h3>Take a little breather</h3><p>Make room for self-care, wellness and short-term respite support.</p><span class="path-label">Find time to recharge</span></a>
 <a class="button path-card" href="assistance.html#support-4"><span class="path-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="16" r="7"/><path d="M5 39v-5a13 13 0 0 1 26 0v5M31 10a7 7 0 0 1 0 14m5 4a12 12 0 0 1 7 11"/></svg></span><h3>Find your community</h3><p>Connect with fellow caregivers and share experiences and resources.</p><span class="path-label">Explore peer support</span></a>
 </div></div></section>
-<section class="home-section wellbeing-section" id="wellbeing"><div class="container wellbeing-layout"><div class="wellbeing-copy"><p class="eyebrow">Care starts with you, too</p><h2>A little space<br>for your well-being</h2><p>Take a pause in your day. Discover ways to reflect, move and stay connected through P3H&rsquo;s digital wellness activities.</p><a class="button button-secondary" href="assistance.html#digital-wellness">Explore digital wellness</a></div><div class="wellbeing-links">
-<a class="button wellbeing-link" href="assistance.html#digital-wellness"><span class="wellbeing-symbol" aria-hidden="true">&#9788;</span><span><strong>Pause &amp; reflect</strong><span>Make room for a quiet moment and check in with yourself.</span></span></a>
-<a class="button wellbeing-link" href="assistance.html#training-programmes"><span class="wellbeing-symbol" aria-hidden="true">&#10047;</span><span><strong>Move &amp; recharge</strong><span>Explore exercise and wellness programmes.</span></span></a>
-<a class="button wellbeing-link" href="assistance.html#support-4"><span class="wellbeing-symbol" aria-hidden="true">&#9825;</span><span><strong>Share &amp; connect</strong><span>Find a listening ear among people who understand.</span></span></a>
-</div></div></section>
+
 <section class="home-section community-section" id="community"><div class="container"><div class="community-heading"><div><p class="eyebrow">Together at P3H</p><h2>Moments of care &amp; connection</h2></div><a class="button button-secondary" href="activities.html">View all activities</a></div><div class="home-activity-grid">
 <a class="button home-activity" href="activities.html#event-0"><img src="assets/images/activities%20media/Forest%20Bathing.jpg" alt="Participants enjoying a P3H Forest Bathing activity" loading="lazy" decoding="async"><div><p class="eyebrow">Time to recharge</p><h3>Forest Bathing</h3><p>Discover moments from our wellness activities.</p><span>View activity photos</span></div></a>
 <a class="button home-activity" href="activities.html#event-1"><img src="assets/images/activities%20media/Memory%20Scrapbooking%20with%20RP.jpg" alt="Memory Scrapbooking with Republic Polytechnic volunteers" loading="lazy" decoding="async"><div><p class="eyebrow">Creating together</p><h3>Memory Scrapbooking</h3><p>Explore a creative activity with our community.</p><span>View activity photos</span></div></a>
 <a class="button home-activity" href="activities.html#event-2"><img src="assets/images/activities%20media/MINDS%20Caregiver%20Carnival.jpg" alt="A moment from the MINDS Caregiver Carnival" loading="lazy" decoding="async"><div><p class="eyebrow">Community connections</p><h3>MINDS Caregiver Carnival</h3><p>A closer look at our caregiver gatherings.</p><span>View activity photos</span></div></a>
 </div></div></section>
-<section class="home-section home-mission"><div class="container mission-layout"><div><p class="eyebrow">Who we help</p><h2>Bridging the gaps in caregiver support</h2><p>Existing subsidised services may not meet every caregiver&rsquo;s needs, while private care can be difficult to afford. P3H supports youth and adult caregivers in this &ldquo;missing middle&rdquo;.</p><a class="intro-link" href="assistance.html#who-we-help" target="_blank" rel="noopener noreferrer">Find out who P3H supports</a></div><div class="mission-target"><strong>2,800</strong><span>caregivers targeted over three years</span><p>Our ambition: ease caregiving pressures, build resilience and create opportunities for timely respite.</p></div></div></section>
+<section class="home-section home-mission"><div class="container mission-layout"><div><p class="eyebrow">Who we help</p><h2>Bridging the gaps in caregiver support</h2><p>Existing subsidised services may not meet every caregiver&rsquo;s needs, while private care can be difficult to afford. P3H supports youth and adult caregivers in this &ldquo;missing middle&rdquo;.</p><a class="intro-link" href="assistance.html#who-we-help" target="_blank" rel="noopener noreferrer">Find out who P3H supports</a></div><div class="mission-purpose"><a class="button button-secondary" href="https://crystal-games.healthy-tec.com/">Play Healthy-Tec Games</a></div></div></section>
 <section class="home-section home-contact"><div class="container"><span class="contact-heart" aria-hidden="true">&#9825;</span><div><p class="eyebrow">Let&rsquo;s take the next step together</p><h2>You don&rsquo;t have to figure it all out alone.</h2><p>Tell us what you need. Our team is here to listen and help you find your next step.</p></div><a class="button" href="contact.html">Connect with P3H</a></div></section>
 <section class="section"><div class="container"><details class="audience-disclosure" id="about"><summary>About P3H &amp; our partners</summary>
 <section class="section launch-photo-section"><div class="container"><figure class="launch-photo"><img src="assets/images/glow-launch-team.jpg" alt="GLOW Community Care and Healthy-Tec teams with caregivers at the P3H soft launch" width="917" height="611" loading="lazy" decoding="async"><figcaption>The GLOW Community Care and Healthy-Tec teams with caregivers at the P3H soft launch. Photo from the April 2026 media release.</figcaption></figure></div></section><section class="section">
@@ -66,13 +76,13 @@
 <article class="card">
 <p class="eyebrow">Community care setting</p>
 <h2>GLOW (Nanyang)</h2>
-<p>A Tzu Chi Active Ageing Centre where P3H was soft-launched on 1 April 2026. Caregivers can use platform tablets at GLOW.</p>
+<p>A Tzu Chi Active Ageing Centre where P3H was soft-launched on 1 April 2026.</p>
 <a href="contact.html#visit" target="_blank" rel="noopener noreferrer">About visiting GLOW &rarr;</a>
 </article>
 <article class="card">
 <p class="eyebrow">Technology collaboration</p>
 <h2>Healthy-Tec</h2>
-<p>The digital enablement and community technology partner that collaborated with GLOW to develop P3H's physical and digital support approach.</p>
+<p>The community technology partner that collaborated with GLOW to develop P3H.</p>
 </article>
 <article class="card">
 <p class="eyebrow">Caregiver training &amp; peer support partner</p>
@@ -93,32 +103,6 @@
 </div>
 </div>
 </section>
-<section class="section section-alt">
-<div class="container">
-<h2>Our three-year caregiver reach targets</h2>
-<div class="grid grid-3">
-<article class="card">
-<p class="eyebrow">Year 1</p>
-<p class="impact-number">700</p>
-<h3>caregivers</h3>
-<p>Establish programme foundations and work towards reduced caregiving burden.</p>
-</article>
-<article class="card">
-<p class="eyebrow">Year 2</p>
-<p class="impact-number">900</p>
-<h3>caregivers</h3>
-<p>Scale participation and strengthen programme consistency.</p>
-</article>
-<article class="card">
-<p class="eyebrow">Year 3</p>
-<p class="impact-number">1,200</p>
-<h3>caregivers</h3>
-<p>Embed effective practices and sustain improvements in caregiver well-being.</p>
-</article>
-</div>
-<p class="contact-note">These are programme targets, not reported achievements. The yearly targets total 2,800 caregivers.</p>
-</div>
-</section>
 <section class="section">
 <div class="container">
 <h2>Other related platforms</h2>
@@ -132,10 +116,13 @@
 </details></div></section></main>
 <footer class="site-footer"><div class="container footer-grid">
 <div><h2>P3H</h2><p>Humanistic Hands and Heart.<br>A caregiver support programme by Tzu Chi Singapore.</p></div>
-<div><h3>Care for the caregiver</h3><p>Supporting youth and adult caregivers in Singapore.</p></div>
+<div><h3>Care for the caregiver</h3><p>Support for different stages of caring.</p><a href="caregiving-journey.html">Your caregiving journey</a><br><a href="caregiving-journey.html#young-caregivers">Young caregivers</a></div>
 <div><h3>Speak with the team</h3><p>Monday to Friday, 9am&ndash;5pm</p><a href="contact.html">Contact &amp; registration &rarr;</a></div>
 </div><div class="container footer-bottom"><small>Practical help, room to recharge and a community that understands.</small></div></footer>
+<script src="js/translations.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/main.js">
 </script>
+<script src="js/activity-highlights.js"></script>
 </body>
 </html>

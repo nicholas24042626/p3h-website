@@ -1,6 +1,6 @@
 # Humanistic Hands and Heart (P3H)
 
-A buildless HTML, CSS and JavaScript website for Tzu Chi Singapore's youth and adult caregiver support programme.
+A buildless HTML, CSS and JavaScript website for Tzu Chi Singapore's youth and adult caregiver support programme, with server-side staff access and activity photo publishing.
 
 ## Local preview
 
@@ -8,11 +8,26 @@ Double-click `Open-Website.cmd` to serve the site at `http://localhost:8080/`. K
 
 For another port, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-Website.ps1 -Port 8081` from this folder.
 
+## Staff activity publishing
+
+Open Activities, choose **Staff access**, enter the configured code and sign in. Add the activity title and date, choose up to six JPEG or PNG photos (3 MB each), add a caption for every photo, confirm approval for public sharing, then choose **Publish photos**. Chinese titles, descriptions and captions are optional. Published photos appear for all visitors, including after a server restart. Existing photo collections remain available.
+
+Signed-in staff can select **Edit photos** under Existing activities to update the title, descriptions and captions, add photos, replace an individual photo, or remove photos. Choose **Save changes** to apply the edits, or **Cancel editing** to keep the published collection unchanged. Keep at least one photo in a collection; **Remove activity** removes the whole collection after confirmation. The original four collections are editable too, with optional dates where no historical date was supplied. Reload activities if another staff session has changed the collection; outdated saves and removals are rejected to prevent overwriting newer work.
+
+Edits and removals are saved as immutable private revisions. Removed photos stop appearing publicly and their old served URLs return 404; original image files and older uploaded versions remain in source/private storage for recovery rather than being permanently erased. Homepage highlights follow edits and removals to the original collections. Backups and any previously downloaded copies remain separate from the live website.
+
+The code is configured privately in this checkout. It is never included in public HTML or JavaScript. To configure a new installation or change the code, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\Set-StaffCode.ps1` and enter the code at the protected prompt. Restart the website server afterward to apply the code and revoke existing sessions.
+
+`Activities-Api.ps1` verifies a salted PBKDF2 hash, issues a server-checked HttpOnly/SameSite session lasting 30 minutes, checks request origins, and limits login attempts. JPEG/PNG uploads are decoded, resized to at most 1920 pixels on the longest side, and saved as fresh JPEG files without original location metadata. Captions also provide accessible image descriptions. The editor previews photos before publishing; publishing is immediate.
+
+The private `.p3h-data/` directory holds the code hash, activity records and photos. It is ignored by Git and blocked by the local HTTP server; only published images are exposed through `/media/activities/`. Back up the whole directory securely to preserve uploads. Do not upload it to static hosting or commit it to source control. Browser test data belongs only in ignored `tmp/`, separate from actual activities.
+
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Activities-Api.Tests.ps1` for authentication, image validation, publication, persistence, session expiry and rate-limit tests. `tests/publishing.html` exercises the real browser flow only on an isolated test server with its own temporary code; never pass the actual staff code in a URL.
+
 ## Content and sources
 
-Programme content comes from the supplied P3H background and bilingual standee. The four support areas, financial grants, referral services, training and digital wellness now live together on `assistance.html`.
+Programme content comes from the supplied P3H background and bilingual standee. The four support areas, financial grants, referral services, training now live together on `assistance.html`.
 
-The current three-year target is 2,800 caregivers, based on the annual targets in the April 2026 media release. Digital activities are available around the clock; staff contact hours and respite arrangements are separate.
 
 The grant acknowledgement links to the official Income announcement:
 https://www.income.com.sg/about-us/corporate-information/press-releases/caregiver-grant
@@ -21,10 +36,14 @@ WhatsApp (6859 1962), email (caregiversupport@tzuchi.org.sg), islandwide coverag
 
 ## Files
 
-- Edit the five canonical pages: `index.html`, `assistance.html`, `activities.html`, `resources.html` and `contact.html`.
+- Edit the six canonical pages: `index.html`, `assistance.html`, `activities.html`, `resources.html`, `contact.html` and `caregiving-journey.html`.
 - Other HTML routes, including `streams/`, are generated compatibility copies. Do not edit them directly.
 - `tools/Sync-Layout.ps1` owns primary navigation, the footer, canonical links and compatibility copies. Run it after editing content: `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\Sync-Layout.ps1`.
 - `css/refinements.css` applies the warm orange P3H styling after existing styles.
+- `css/accessibility.css` provides shared reading controls, readable footer contrast, responsive journey layouts and print styles. It is loaded last by the layout sync tool.
+- All six canonical pages share one English / 中文 switch, including navigation, reading controls, FAQs, accessible labels and slideshow counters. English is the first-visit default; no automatic browser-language detection is used. Explicit `?lang=en` / `?lang=zh` links override the saved preference. Internal HTML links carry the current language, including new tabs and compatibility routes. External sites and documents retain their original language.
+- `js/translations.js` contains reviewed Singapore Simplified Chinese copy keyed by normalised English source text. `js/i18n.js` applies the translations while preserving existing markup, filters, focus and section bookmarks. Update dictionary entries whenever English source text changes. The journey guide keeps longer paired `data-language` blocks in its HTML; update both versions together. No translation service, API key or network request is required.
+- English source HTML is the fallback without JavaScript; Chinese guide blocks and inactive controls stay hidden. Text size and site-language preferences use browser-local storage when available; they contain no personal or health information. Browser zoom and print remain usable without JavaScript. Printing with JavaScript temporarily expands disclosures, includes all support sections and restores the previous disclosure state afterward.
 - `js/main.js` controls mobile navigation, active-page indicators and support sections with bookmark and browser history support. Without JavaScript, all sections remain readable.
 - FAQs use native HTML disclosure elements and work without JavaScript.
 - `assets/documents/p3h-caregiver-support.pdf` is the original print standee.
@@ -41,17 +60,23 @@ Add approved activity content to `activities.html` and confirmed visit arrangeme
 
 ## Navigation and maintenance
 
-The primary navigation is **Home / Caregiver support / Activities / Resources & FAQs / Contact**. Every page has a visible current-page indicator and a Home link. Support functions are reachable through the Caregiver support page and its five section links. Registration and visit guidance live on Contact; FAQs and downloads live on Resources & FAQs.
+The primary navigation is **Home / Caregiver support / Activities / Resources & FAQs / Contact**. Every page has a visible current-page indicator and a Home link. Support functions are reachable through the Caregiver support page and its four section links. Registration and visit guidance live on Contact; FAQs and downloads live on Resources & FAQs.
 
 Regular text hyperlinks open a new tab with `noopener noreferrer`. Navigation menus, section links, buttons, the brand link and Skip to content stay in the current tab. Browsers may hand email or messaging links to the visitor's configured application.
 
 See [NAVIGATION-AUDIT.md](NAVIGATION-AUDIT.md) for the original route audit, feature ownership, old URL mapping, journey comparisons and verification results. Old URLs serve complete copies of their canonical workspace without redirect hops. They carry canonical links and `noindex,follow`, and are excluded from chatbot grounding.
 
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Navigation.Tests.ps1` to validate navigation, content retention, local files, fragments and structural nesting. With the local server running, open `/tests/navigation.html` to check in-page sections, bookmarks, Back/Forward history, filters, compatibility routes and responsive navigation. Run the browser checks at desktop and mobile widths.
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Navigation.Tests.ps1` to validate navigation, content retention, local files, fragments and structural nesting. With the local server running, open `/tests/navigation.html` to check in-page sections, bookmarks, Back/Forward history, filters, compatibility routes, responsive navigation, language switching, persistent text size and print disclosure restoration. Run the browser checks at desktop and mobile widths (use `?width=375` for an exact mobile iframe).
+
+Open `/tests/language.html` (also with `?width=375`) to check Chinese text and accessible-label coverage, first-visit English, exact English restoration, language persistence, internal links, page titles, nested routes, and photo controls. Partner brand names and service acronyms intentionally retain their recognisable English forms. Chinese copy uses 看护者 consistently, with local terms such as 护联中心、失智症、乐龄人士、暂托服务 and 电邮. The copy was reviewed for meaning and natural Singapore usage; this is not a claim of external professional certification.
+
+## Caregiving journey content review
+
+The journey guide and seven financial-grant summaries were reviewed on 23 November 2026 against the linked AIC, MSF and South West CDC resources. Summary review dates do not confirm service availability or individual eligibility. The South West Caregiver Support Fund now links to the current CDC page rather than the older PDF, and SMF links directly to its provider page. Update review dates only after checking sources again. Youth privacy guidance invites visitors to ask the team about consent and confidentiality; it does not invent a P3H privacy or safeguarding policy. Former-caregiver participation and referrals remain subject to team confirmation.
 
 ## Hosting
 
-Serve `p3h-website` as the static site root. No build step is required. Preserve the folder structure and UTF-8 encoding; serve HTML, CSS, JavaScript and PDFs with their appropriate content types.
+The current server binds only to this computer's loopback interface. Public hosting has not been configured. No build step is required for the information pages, but static hosting alone cannot run staff login or save uploads. Public deployment needs a backend implementing the activity API, durable private storage, and HTTPS with Secure session cookies. The included PowerShell server is a local preview implementation, not a public production server. Do not expose it directly to the internet. Preserve the folder structure and UTF-8 encoding, and migrate the private uploaded data through the backend rather than publishing the directory.
 
 ## Retained chatbot implementation
 
@@ -59,6 +84,6 @@ The chatbot has been removed from all public pages. Its JavaScript, API implemen
 
 ## April 2026 media release update
 
-The supplied media release dated 7 April 2026 is available at assets/documents/p3h-media-release-20260407.pdf. It confirms the 1 April soft launch at GLOW (Nanyang), Healthy-Tec collaboration, home/centre respite, micro jobs and digital wellness categories. The published annual caregiver targets sum to 2,800 (700 + 900 + 1,200), replacing the earlier rounded 3,000 figure. No GLOW address or installation link was supplied, so these are requested through the team.
+The supplied media release dated 7 April 2026 is available at assets/documents/p3h-media-release-20260407.pdf. It confirms the 1 April soft launch at GLOW (Nanyang), Healthy-Tec collaboration, home/centre respite and micro jobs. The published annual caregiver targets sum to 2,800 (700 + 900 + 1,200), replacing the earlier rounded 3,000 figure. Confirm current visit arrangements with the team.
 
 The launch media release is retained as an archival source and is no longer linked from the public resources page because it describes a retired feature.

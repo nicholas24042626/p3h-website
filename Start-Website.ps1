@@ -1,8 +1,11 @@
-param([int]$Port = 8080, [switch]$NoBrowser)
+param([int]$Port = 8080, [switch]$NoBrowser, [string]$ActivityDataDirectory)
 
 $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath($PSScriptRoot)
 . (Join-Path $root 'Chatbot-Api.ps1')
+. (Join-Path $root 'Activities-Api.ps1')
+if (-not $ActivityDataDirectory) { $ActivityDataDirectory = Join-Path $root '.p3h-data' }
+$activityState = New-P3HActivityState -DataDirectory $ActivityDataDirectory -AllowedOrigins @("http://localhost:$Port", "http://127.0.0.1:$Port") -WebsiteRoot $root
 $chatRequests = [Collections.Generic.Queue[datetime]]::new()
 $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, $Port)
 $types = @{
@@ -46,7 +49,46 @@ try {
             $status = '200 OK'
             $type = 'text/plain; charset=utf-8'
             $route = ($parts[1] -split '\?')[0]
-            if ($route -eq '/api/chat/status' -and $parts[0] -eq 'GET') {
+            $extraHeaders = ''
+            if ($route -match '^/(?:api/(?:staff(?:/|$)|activities(?:/|$))|media/activities/)') {
+                $requestHeaders = @{}
+                foreach ($line in ($headerText -split "`r`n" | Select-Object -Skip 1)) {
+                    if (-not $line) { continue }
+                    $colon = $line.IndexOf(':')
+                    if ($colon -lt 1) { throw 'Invalid header' }
+                    $key = $line.Substring(0, $colon).Trim()
+                    if ($requestHeaders.ContainsKey($key)) { throw 'Duplicate header' }
+                    $requestHeaders[$key] = $line.Substring($colon + 1).Trim()
+                }
+                $length = 0
+                $lengthValid = -not $requestHeaders.ContainsKey('Content-Length') -or [int]::TryParse($requestHeaders['Content-Length'], [ref]$length)
+                $limit = if ($route -eq '/api/staff/login') { 1024 } else { 26214400 }
+                if ($requestHeaders['Host'] -notin @("localhost:$Port", "127.0.0.1:$Port") -or $requestHeaders.ContainsKey('Transfer-Encoding')) {
+                    $response = New-P3HActivityResponse -Status 403 -Payload @{ error = 'Request not allowed.' }
+                } elseif (-not $lengthValid -or $length -lt 0 -or $length -gt $limit) {
+                    $response = New-P3HActivityResponse -Status 413 -Payload @{ error = 'The upload is too large. Choose up to six photos, each 3 MB or less.' }
+                } else {
+                    $requestBytes = New-Object byte[] $length
+                    if ($length -gt 0) {
+                        if ($headerText -match '(?im)^Expect:\s*100-continue\s*$') {
+                            $continue = [Text.Encoding]::ASCII.GetBytes("HTTP/1.1 100 Continue`r`n`r`n")
+                            $stream.Write($continue, 0, $continue.Length)
+                        }
+                        $offset = 0
+                        while ($offset -lt $length) {
+                            $read = $stream.Read($requestBytes, $offset, $length - $offset)
+                            if ($read -eq 0) { throw 'Incomplete body' }
+                            $offset += $read
+                        }
+                    }
+                    $response = Invoke-P3HActivityRequest -State $activityState -Method $parts[0] -Route $route -Headers $requestHeaders -RequestBytes $requestBytes -ClientAddress $client.Client.RemoteEndPoint.Address.ToString()
+                }
+                $reason = @{ 200 = 'OK'; 201 = 'Created'; 400 = 'Bad Request'; 401 = 'Unauthorized'; 403 = 'Forbidden'; 404 = 'Not Found'; 409 = 'Conflict'; 413 = 'Content Too Large'; 429 = 'Too Many Requests'; 500 = 'Internal Server Error'; 503 = 'Service Unavailable' }
+                $status = "$($response.Status) $($reason[[int]$response.Status])"
+                $type = $response.ContentType
+                $body = $response.Body
+                foreach ($key in $response.Headers.Keys) { $extraHeaders += "$($key): $($response.Headers[$key])`r`n" }
+            } elseif ($route -eq '/api/chat/status' -and $parts[0] -eq 'GET') {
                 $type = 'application/json; charset=utf-8'
                 $body = [Text.Encoding]::UTF8.GetBytes((@{ enabled = [bool]$env:OPENAI_API_KEY } | ConvertTo-Json -Compress))
             } elseif ($route -eq '/api/chat' -and $parts[0] -eq 'POST') {
@@ -87,7 +129,7 @@ try {
                     catch { $status = '502 Bad Gateway'; $json = '{"error":"AI unavailable. Please use the local guide."}' }
                 }
                 $body = [Text.Encoding]::UTF8.GetBytes($json)
-            } elseif (-not $file.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+            } elseif ($path -match '(?:^|[\\/])\.' -or $path -match '^(?:tmp|tools)(?:[\\/]|$)' -or -not $file.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
                 $status = '403 Forbidden'
                 $body = [Text.Encoding]::UTF8.GetBytes('Forbidden')
             } elseif ($parts[0] -notin @('GET', 'HEAD')) {
@@ -96,6 +138,9 @@ try {
             } elseif ([IO.Path]::GetExtension($file) -notin @('.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg', '.pdf', '.ico', '.webp')) {
                 $status = '403 Forbidden'
                 $body = [Text.Encoding]::UTF8.GetBytes('Forbidden')
+            } elseif ($route -like '/assets/images/*' -and -not (Test-P3HDefaultPhotoVisible $activityState $route)) {
+                $status = '404 Not Found'
+                $body = [Text.Encoding]::UTF8.GetBytes('Photo not found')
             } elseif (-not [IO.File]::Exists($file)) {
                 $status = '404 Not Found'
                 $body = [Text.Encoding]::UTF8.GetBytes('Not found')
@@ -105,7 +150,7 @@ try {
                 $type = 'application/octet-stream'
                 if ($types.ContainsKey($extension)) { $type = $types[$extension] }
             }
-            $header = [Text.Encoding]::ASCII.GetBytes("HTTP/1.1 $status`r`nContent-Type: $type`r`nContent-Length: $($body.Length)`r`nX-Content-Type-Options: nosniff`r`nCache-Control: no-store`r`nConnection: close`r`n`r`n")
+            $header = [Text.Encoding]::ASCII.GetBytes("HTTP/1.1 $status`r`nContent-Type: $type`r`nContent-Length: $($body.Length)`r`nX-Content-Type-Options: nosniff`r`nX-Frame-Options: SAMEORIGIN`r`nReferrer-Policy: same-origin`r`nCache-Control: no-store`r`n$($extraHeaders)Connection: close`r`n`r`n")
             $stream.Write($header, 0, $header.Length)
             if ($parts[0] -ne 'HEAD') { $stream.Write($body, 0, $body.Length) }
         } catch {

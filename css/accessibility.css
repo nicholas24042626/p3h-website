@@ -1,0 +1,77 @@
+/* Reading preferences and journey guidance share the existing P3H palette. */
+body { font-size: 1.0625rem; }
+html[data-text-size="large"] { font-size: 125%; }
+[hidden] { display: none !important; }
+.skip-link { z-index: 100; }
+main { overflow-wrap: anywhere; }
+main [id] { scroll-margin-top: 9rem; }
+button { font: inherit; }
+.reading-tools { background: #faf8f6; border-bottom: 1px solid var(--line); }
+.reading-tools-inner, .reading-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.reading-tools-inner { justify-content: space-between; padding: .5rem 0; }
+.reading-tools a, .reading-tools button, .language-options button { min-height: 44px; display: inline-flex; align-items: center; }
+.reading-tools a { color: #813711; font-size: .9375rem; }
+.reading-controls { font-size: .875rem; gap: .5rem; }
+.reading-controls button, .language-options button { border: 1px solid #927564; border-radius: 6px; background: #fff; color: #49352c; padding: .5rem .75rem; cursor: pointer; }
+.reading-controls button[aria-pressed="true"], .language-options button[aria-pressed="true"] { background: #813711; color: #fff; border-color: #813711; }
+.reading-controls button:hover, .language-options button:hover { outline: 2px solid #813711; outline-offset: 1px; }
+.main-nav a, .menu-toggle { min-height: 44px; }
+.site-footer { color: #493f39; }
+.site-footer h2, .site-footer h3, .site-footer a { color: #49352c; }
+.footer-bottom { border-top-color: #d9cbbf; }
+.journey-start { background: #faf8f6; }
+.journey-start .section-heading { max-width: 46rem; }
+.journey-card { display: flex; flex-direction: column; align-items: flex-start; border-top: 4px solid #bd6b3c; }
+.journey-card:nth-child(2) { border-top-color: #52745f; }
+.journey-card:nth-child(3) { border-top-color: #80709a; }
+.journey-card h3 { margin-top: 0; }
+.journey-card .button { margin-top: auto; }
+.journey-young { margin-top: var(--grid-gap); background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+.journey-young p:last-child { margin-bottom: 0; }
+.language-options { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1.5rem; }
+.reading-tools .language-options { margin-top: 0; gap: .5rem; }
+html[lang="zh-Hans-SG"] body { font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.8; }
+html[lang="zh-Hans-SG"] .eyebrow { letter-spacing: .04em; text-transform: none; }
+html[lang="zh-Hans-SG"] h1, html[lang="zh-Hans-SG"] h2, html[lang="zh-Hans-SG"] h3 { letter-spacing: 0; line-height: 1.4; }
+.journey-nav { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; padding: 1.5rem 0; }
+.journey-nav a { min-height: 44px; display: inline-flex; align-items: center; border: 1px solid #927564; border-radius: 7px; padding: .65rem 1rem; text-decoration: none; background: #fff; color: #813711; }
+.journey-nav a:hover { background: #fff2e8; }
+.journey-section { border-top: 1px solid var(--line); }
+.journey-section h2 { max-width: 30ch; }
+.journey-section p, .journey-section li { max-width: 68ch; }
+.journey-section li + li { margin-top: .75rem; }
+.journey-section h3 { margin-top: 1.75rem; }
+.journey-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); align-items: start; }
+.journey-next { background: #f4f7f4; border: 1px solid #c7d7ca; border-radius: 14px; }
+.journey-next h3 { margin-top: 0; }
+.journey-next .button { white-space: normal; }
+.journey-next p:last-child { margin-bottom: 0; }
+.conversation-prompt { border-left: 4px solid #bd6b3c; padding: 1rem 1.25rem; background: #fff5ec; margin: 1.25rem 0; }
+.review-note { font-size: .875rem; color: #65564c; }
+.journey-section [lang|="zh"], .page-hero [lang|="zh"] { line-height: 1.85; }
+.journey-section h2 [lang|="zh"], h1 [lang|="zh"] { line-height: 1.4; }
+@media (max-width: 760px) {
+  .journey-layout { grid-template-columns: 1fr; }
+  .journey-start .grid-3 { grid-template-columns: 1fr; }
+  .reading-tools-inner { align-items: flex-start; }
+  .journey-nav { display: grid; grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+@media print {
+  @page { margin: 16mm; }
+  html, html[data-text-size="large"] { font-size: 11pt; }
+  body { color: #000; background: #fff; }
+  .site-header, .reading-tools, .site-footer, .home-shortcuts, .language-options, .journey-nav, .workspace-nav, .skip-link { display: none !important; }
+  .container, .header-inner { width: 100%; max-width: none; }
+  .section, .home-section, .journey-section, .page-hero, .journey-start { padding: 1rem 0; background: #fff; }
+  .journey-layout, .grid, .path-grid, .mission-layout { display: block; }
+  .card, .journey-next, .journey-young { box-shadow: none; margin-bottom: 1rem; border: 1px solid #777; background: #fff; }
+  h1, h2, h3 { color: #000; break-after: avoid; }
+  p, li { orphans: 3; widows: 3; }
+  a, .button { color: #000 !important; background: transparent !important; }
+  .button { border: 1px solid #777; }
+  img { max-height: 65mm; width: auto; }
+  [data-workspace-panel][hidden], .grant-category[hidden], .grant-card[hidden], .scheme-card[hidden] { display: block !important; }
+}

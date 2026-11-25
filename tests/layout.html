@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Layout checks</title></head>
+<body><h1>Layout checks</h1><pre id="results">Running...</pre>
+<iframe title="Website under test" style="display:block;border:0;height:1000px"></iframe>
+<script>
+(async () => {
+  const output = document.querySelector('#results'), frame = document.querySelector('iframe');
+  const failures = [];
+  let checks = 0;
+  const check = (ok, message) => { checks++; if (!ok) failures.push(message); };
+  const close = (a, b) => Math.abs(a - b) < 1;
+  async function load(page, width, language, large = false) {
+    frame.style.width = `${width}px`;
+    await new Promise(resolve => { frame.onload = resolve; frame.src = `../${page}?lang=${language}`; });
+    const doc = frame.contentDocument;
+    doc.documentElement.dataset.textSize = large ? 'large' : 'standard';
+    // Force geometry after the page and its translations have loaded.
+    void doc.documentElement.offsetWidth;
+    return doc;
+  }
+  function inspect(doc, label) {
+    doc.querySelectorAll('details').forEach(detail => { detail.open = true; });
+    doc.querySelectorAll('[data-workspace-panel]').forEach(panel => { panel.hidden = false; });
+    const win = doc.defaultView, css = el => win.getComputedStyle(el);
+    const visible = el => el.getClientRects().length > 0;
+    check(doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1, `${label}: horizontal overflow`);
+    const container = doc.querySelector('main .container');
+    const header = doc.querySelector('.header-inner');
+    check(close(container.getBoundingClientRect().left, header.getBoundingClientRect().left), `${label}: main/header edges`);
+    const cards = [...doc.querySelectorAll('.grid > .card')].filter(visible);
+    cards.forEach(card => {
+      const style = css(card), title = card.querySelector('h2, h3');
+      check(style.display === 'flex' && style.flexDirection === 'column', `${label}: card column layout`);
+      check(close(parseFloat(style.paddingLeft), parseFloat(style.paddingRight)), `${label}: card padding`);
+      const token = parseFloat(css(doc.documentElement).getPropertyValue('--card-padding')) * parseFloat(css(doc.documentElement).fontSize);
+      check(close(parseFloat(style.paddingLeft), token), `${label}: shared card padding`);
+      check(style.fontFamily === css(doc.body).fontFamily, `${label}: card font`);
+      if (title) check(close(parseFloat(css(title).fontSize), 1.25 * parseFloat(css(doc.documentElement).fontSize)), `${label}: card heading size`);
+    });
+    const journey = [...doc.querySelectorAll('.journey-card')];
+    for (let i = 1; i < journey.length; i++) {
+      const prev = journey[i - 1], current = journey[i];
+      const a = prev.getBoundingClientRect(), b = current.getBoundingClientRect();
+      if (close(a.top, b.top)) {
+        check(close(a.bottom, b.bottom), `${label}: journey card bottoms`);
+        check(close(prev.querySelector('.button').getBoundingClientRect().bottom, current.querySelector('.button').getBoundingClientRect().bottom), `${label}: journey button bottoms`);
+      }
+    }
+    [...doc.querySelectorAll('main .button')].filter(visible).forEach(button => {
+      const box = button.getBoundingClientRect();
+      check(box.height >= 44, `${label}: button touch size`);
+      check(button.scrollWidth <= button.clientWidth + 1, `${label}: button text overflow`);
+    });
+    const sections = [...doc.querySelectorAll('main > .section, main > .home-section, main > .journey-start')].filter(visible);
+    sections.forEach(section => check(close(parseFloat(css(section).paddingTop), parseFloat(css(section).paddingBottom)), `${label}: section spacing`));
+  }
+  const options = new URLSearchParams(location.search);
+  if (options.has('preview')) {
+    const doc = await load(options.get('preview') || 'index.html', Number(options.get('width') || 1280), options.get('lang') || 'en');
+    document.querySelector('h1').hidden = true;
+    output.hidden = true;
+    document.body.style.margin = '0';
+    frame.style.height = '1400px';
+    if (options.has('cards')) {
+      doc.querySelectorAll('main > :not(.journey-start), header, .reading-tools, footer').forEach(el => { el.hidden = true; });
+      doc.documentElement.style.scrollBehavior = 'auto';
+      doc.defaultView.scrollTo(0, 0);
+    }
+    return;
+  }
+  for (const width of [1280, 768, 390]) {
+    for (const language of ['en', 'zh']) {
+      for (const page of ['index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html']) {
+        inspect(await load(page, width, language), `${page} ${width}px ${language}`);
+      }
+    }
+  }
+  for (const language of ['en', 'zh']) inspect(await load('index.html', 390, language, true), `Home 390px ${language} larger text`);
+  output.textContent = `${failures.length ? 'FAIL' : 'PASS'}: ${checks} layout checks across six pages, three widths, both languages and larger text.\n${failures.join('\n')}`;
+  document.body.dataset.complete = 'true';
+})().catch(error => { document.querySelector('#results').textContent = `ERROR: ${error.stack}`; });
+</script></body></html>

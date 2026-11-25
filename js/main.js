@@ -1,5 +1,34 @@
 document.documentElement.classList.add('js');
 document.addEventListener('DOMContentLoaded', () => {
+  // Preferences are optional: reading controls still work if storage is blocked.
+  const preference = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch { /* Session-only preference. */ } }
+  };
+  const textButtons = [...document.querySelectorAll('[data-text-size]')];
+  const setTextSize = value => {
+    const size = value === 'large' ? 'large' : 'standard';
+    document.documentElement.dataset.textSize = size;
+    textButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.textSize === size)));
+  };
+  setTextSize(preference.get('p3h-text-size'));
+  document.querySelectorAll('[data-reading-controls]').forEach(controls => { controls.hidden = false; });
+  textButtons.forEach(button => button.addEventListener('click', () => {
+    setTextSize(button.dataset.textSize);
+    preference.set('p3h-text-size', button.dataset.textSize);
+  }));
+  document.querySelectorAll('[data-print]').forEach(button => button.addEventListener('click', () => window.print()));
+
+  // Expand disclosures temporarily for printing, then restore the reader's view.
+  let printDisclosures = [];
+  window.addEventListener('beforeprint', () => {
+    printDisclosures = [...document.querySelectorAll('main details:not([open])')];
+    printDisclosures.forEach(detail => { detail.open = true; });
+  });
+  window.addEventListener('afterprint', () => {
+    printDisclosures.forEach(detail => { detail.open = false; });
+    printDisclosures = [];
+  });
   const nav = document.querySelector('.main-nav');
   const toggle = document.querySelector('.menu-toggle');
   const closeMenu = () => {

@@ -28,11 +28,10 @@
     { title: 'Explore the four support areas', keys: ['support', 'help', 'assistance', 'services', 'streams'], text: 'You can explore four areas: care navigation and financial assistance; caregiver training and planning ahead; self-care and respite; and peer support and resource sharing. You do not need to choose an area before contacting the team.', source: ['streams/stream-1.html', 'streams/stream-2.html', 'streams/stream-3.html', 'streams/stream-4.html'] },
     { title: 'Financial assistance', keys: ['financial', 'money', 'grant', 'subsidy', 'cost', 'hcg', 'ctg', 'smf', 'food'], text: 'P3H helps caregivers explore suitable grants and navigate applications. Its website introduces the Home Caregiving Grant, Caregivers Training Grant, and Seniors’ Mobility and Enabling Fund. Eligibility and approval depend on each scheme; ask the team about current requirements and costs.', source: ['how-we-help.html#financial-support', 'assistance.html#other-assistance'] },
     { title: 'Training and planning ahead', keys: ['training', 'skills', 'learn', 'course', 'planning', 'future'], text: 'P3H includes practical caregiver training and forward care planning. Talk with the team about the skills you want to build and changing care needs; they can advise on suitable training and participation requirements.', source: 'streams/stream-2.html' },
-    { title: 'Respite and self-care', keys: ['respite', 'break', 'burnout', 'tired', 'stress', 'overwhelmed', 'self care', 'self-care', 'counselling'], text: 'P3H describes short-term respite at home or at the centre, alongside professional counselling and digital wellness activities. Contact the team to discuss availability and arrangements. Digital activities are available around the clock on a personal device; staff and respite care are not available 24/7.', source: 'streams/stream-3.html' },
+    { title: 'Respite and self-care', keys: ['respite', 'break', 'burnout', 'tired', 'stress', 'overwhelmed', 'self care', 'self-care', 'counselling'], text: 'P3H describes short-term respite at home or at the centre, alongside referrals to professional counselling. Contact the team to discuss availability and arrangements.', source: 'streams/stream-3.html' },
     { title: 'Peer support', keys: ['peer', 'buddy', 'lonely', 'connect', 'community', 'group', 'sharing'], text: 'P3H offers peer support and resource sharing, including peer groups and buddy check-ins. Ask the team about current opportunities to connect with other caregivers.', source: 'streams/stream-4.html' },
     { title: 'Activities and venues', keys: ['venue', 'where', 'glow', 'address', 'schedule', 'event', 'activities', 'nanyang'], text: 'P3H soft-launched at GLOW (Nanyang), a Tzu Chi Active Ageing Centre. Confirm current activity dates, venue addresses and accessibility arrangements with the team before attending.', source: 'venues.html' },
     { title: 'Contact the P3H team', keys: ['contact', 'whatsapp', 'email', 'phone', 'hours', 'staff', '24/7', 'register', 'registration', 'sign up'], text: 'Message Nanyang GLOW at 6859 1962 on WhatsApp, message Bukit Batok GLOW at 6347 2801 on WhatsApp, or email caregiversupport@tzuchi.org.sg. Staff contact hours are Monday–Friday, 9am–5pm. You can also use the caregiver support registration form linked on the contact page.', source: 'contact.html' },
-    { title: 'Digital wellness', keys: ['digital', 'wellness', 'app', 'install', 'tablet', 'sleep', 'mood', 'journal', 'meditation'], text: 'The P3H platform includes mindfulness, movement, mood logs, journal prompts, sleep planning and community connections. Use a tablet at GLOW or ask the team for help installing it on a personal phone or tablet. The website does not provide a verified installation link.', source: 'programmes.html' }
   ];
   const grants = [
     { name: 'Home Caregiving Grant (HCG)', keys: ['hcg', 'home caregiving grant'], text: 'Monthly cash payouts of up to S$600 to help eligible families care for persons with moderate to severe disabilities.', category: 'Caregiving support' },
@@ -59,11 +58,6 @@
       ['Tell us what you need', 'Think about your main caregiving challenge: finding support, learning skills, taking a break or connecting with others.', 'assistance.html'],
       ['Contact the team', 'Open the contact page to find the caregiver registration form, WhatsApp and email. Briefly explain the support you are looking for.', 'contact.html'],
       ['Agree on your next step', 'Discuss suitable support, participation requirements, any costs and access arrangements with the team before attending.', 'faq.html']
-    ],
-    'Use digital wellness': [
-      ['Arrange access', 'Ask the P3H team about installation on your phone or tablet, or tablet access at GLOW. Confirm centre opening arrangements.', 'contact.html'],
-      ['Choose a small activity', 'Explore available mindfulness, movement, mood logging or journaling activities. Start with something that suits your needs.', 'programmes.html'],
-      ['Build your routine', 'Make time for an activity that feels useful. Ask the team if you need help finding platform features.', 'programmes.html#digital-wellness']
     ],
     'Find caregiver support': [
       ['Explore your options', 'Read about care navigation, training, respite and peer support. Choose the area closest to your current needs.', 'assistance.html'],
@@ -116,7 +110,6 @@
         'assistance.html#financial-support': 'Financial grants',
         'assistance.html#other-assistance': 'Care & daily living',
         'assistance.html#training-programmes': 'Training',
-        'assistance.html#digital-wellness': 'Digital wellness',
         'assistance.html#who-we-help': 'Who P3H supports',
         'resources.html#faqs': 'Resources & FAQs',
         'contact.html#visit': 'Plan your visit'
@@ -148,7 +141,7 @@
   function welcome() {
     messages.replaceChildren(); history = []; tour = null; lastTopic = null;
     add('Hello, I’m your P3H companion. Ask me about caregiver support, or let me walk you through getting started. How can I help today?');
-    chips(['What is P3H?', 'Get started', 'Find caregiver support', 'Use digital wellness']);
+    chips(['What is P3H?', 'Get started', 'Find caregiver support']);
   }
   async function showStep() {
     const item = tutorials[tour][step];
@@ -201,7 +194,7 @@
     if (application && lastTopic === topics[3]) return { text: 'Which grant would you like to apply for: HCG, a South West fund, ComCare, CTG or SMF? Each scheme has a different process. Our GLOW teams can help with applications.', source: 'how-we-help.html' };
     if (lastTopic && /^(how much|am i eligible|can i qualify|how do i apply|where do i apply)$/.test(q)) return { text: 'Which scheme or service do you mean? Tell me its name so I can point you to the right details.', source: 'how-we-help.html' };
     if (/\b(team|staff|contact)\b/.test(q) && /\b(when|available|hours|reach|call)\b/.test(q)) { lastTopic = topics[8]; return lastTopic; }
-    const aliases = { subsidy: ['subsidies'], eligible: ['eligibility'], register: ['registration', 'sign up', 'signup', 'enrol', 'enroll'], respite: ['rest', 'exhausted'], contact: ['telephone', 'call', 'reach'], training: ['train'], digital: ['mindfulness', 'yoga', 'breathing'], grant: ['grants'], venue: ['venues', 'location'], schedule: ['schedules', 'timing', 'when'], peer: ['peers'] };
+    const aliases = { subsidy: ['subsidies'], eligible: ['eligibility'], register: ['registration', 'sign up', 'signup', 'enrol', 'enroll'], respite: ['rest', 'exhausted'], contact: ['telephone', 'call', 'reach'], training: ['train'], grant: ['grants'], venue: ['venues', 'location'], schedule: ['schedules', 'timing', 'when'], peer: ['peers'] };
     const matches = term => { const words = normalize(term); return (` ${q} `).includes(` ${words} `) || (` ${q} `).includes(` ${words}s `); };
     const ranked = topics.map((topic, index) => ({ topic, score: topic.keys.reduce((sum, key) => {
       if (index === 0 && ['p3h', 'what is', 'heart', 'about'].includes(key)) return sum;
@@ -210,7 +203,7 @@
     }, 0) })).sort((a, b) => b.score - a.score);
     if (/^(what is|whats|tell me about|explain|about) (p3h|humanistic hands and heart)$/.test(q) || q === 'p3h') return topics[0];
     if (lastTopic && /^(tell me more|more|how do i (get|apply for) (it|this)|what about (it|this)|how does it work)$/.test(q)) return lastTopic;
-    if (!ranked[0].score) return { text: 'I don’t have a confirmed answer to that in the P3H website content. Try asking about training, respite, financial assistance or digital wellness. For individual advice or current arrangements, please contact the P3H team.', source: 'contact.html' };
+    if (!ranked[0].score) return { text: 'I don’t have a confirmed answer to that in the P3H website content. Try asking about training, respite or financial assistance. For individual advice or current arrangements, please contact the P3H team.', source: 'contact.html' };
     lastTopic = ranked[0].topic; return lastTopic;
   }
   async function ask(question) {
@@ -221,9 +214,9 @@
     if (tutorial) { tour = tutorial; step = 0; showStep(); return; }
     if (tour && /^(next|next step|continue)$/.test(q)) { step = Math.min(step + 1, tutorials[tour].length - 1); showStep(); return; }
     if (tour && /^(previous|previous step|back)$/.test(q)) { step = Math.max(0, step - 1); showStep(); return; }
-    if (tour && /^(finish tutorial|finish|stop tutorial)$/.test(q)) { tour = null; const response = 'You’re ready for your next step. The P3H team can help with individual arrangements.'; await reply(response, 'contact.html'); remember(question, response); chips(['What support is available?', 'Digital wellness', 'Contact the P3H team']); return; }
+    if (tour && /^(finish tutorial|finish|stop tutorial)$/.test(q)) { tour = null; const response = 'You’re ready for your next step. The P3H team can help with individual arrangements.'; await reply(response, 'contact.html'); remember(question, response); chips(['What support is available?', 'Contact the P3H team']); return; }
     tour = null;
-    if (!ai) { const answer = local(question); await reply(answer.text, answer.source); remember(question, answer.text); chips(['Get started', 'Use digital wellness', 'Contact the P3H team']); return; }
+    if (!ai) { const answer = local(question); await reply(answer.text, answer.source); remember(question, answer.text); chips(['Get started', 'Contact the P3H team']); return; }
     busy = true; send.disabled = true; panel.setAttribute('aria-busy', 'true'); chips([]); const current = generation;
     const controller = new AbortController(); pendingRequest = controller;
     const timeout = setTimeout(() => controller.abort(), 35000);
@@ -237,7 +230,7 @@
     } catch {
       if (current !== generation) return;
       add('AI is temporarily unavailable. Here is an answer from the local P3H guide:'); const answer = local(question); add(answer.text, 'assistant', answer.source); remember(question, answer.text);
-    } finally { clearTimeout(timeout); waiting.remove(); if (current === generation) { pendingRequest = null; busy = false; send.disabled = false; panel.removeAttribute('aria-busy'); chips(['Get started', 'Use digital wellness', 'Contact the P3H team']); if (!panel.hidden) input.focus(); } }
+    } finally { clearTimeout(timeout); waiting.remove(); if (current === generation) { pendingRequest = null; busy = false; send.disabled = false; panel.removeAttribute('aria-busy'); chips(['Get started', 'Contact the P3H team']); if (!panel.hidden) input.focus(); } }
   }
   function toggle(open) { panel.hidden = !open; launcher.setAttribute('aria-expanded', String(open)); if (open) input.focus(); else launcher.focus(); }
   launcher.addEventListener('click', () => toggle(panel.hidden)); host.querySelector('.chat-close').addEventListener('click', () => toggle(false));

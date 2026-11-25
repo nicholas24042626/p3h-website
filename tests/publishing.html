@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Activity publishing checks</title></head>
+<body><h1>Activity publishing checks</h1><p>Run only against an isolated test server with a temporary staff code supplied in the code query parameter.</p><pre id="results">Running...</pre><iframe title="Activities under test" style="width:100%;height:1000px;border:0"></iframe>
+<script>
+(async () => {
+  const output = document.querySelector('#results'), frame = document.querySelector('iframe');
+  const code = new URLSearchParams(location.search).get('code');
+  if (!code) { output.textContent = 'SKIP: provide an isolated test server and its temporary code.'; return; }
+  const checks = [];
+  const check = (name, ok) => { if (!ok) throw new Error(name); checks.push(`PASS: ${name}`); output.textContent = checks.join('\n'); };
+  const waitFor = async predicate => {
+    for (let i = 0; i < 200; i++) { if (predicate()) return; await new Promise(resolve => setTimeout(resolve, 100)); }
+    throw new Error('Timed out waiting for the publishing interface');
+  };
+  await new Promise(resolve => { frame.onload = resolve; frame.src = '../activities.html?lang=en'; });
+  const doc = frame.contentDocument, win = frame.contentWindow;
+  const status = () => doc.querySelector('#staff-status').textContent;
+  doc.querySelector('#staff-access').click();
+  await waitFor(() => !doc.querySelector('#staff-login').hidden && status() === '');
+  check('Staff access opens the code form', !doc.querySelector('#staff-panel').hidden);
+  const login = doc.querySelector('#staff-login');
+  login.elements.code.value = 'wrong-test-code'; login.requestSubmit();
+  await waitFor(() => status().includes('incorrect'));
+  check('Wrong code cannot open publishing', doc.querySelector('#staff-workspace').hidden);
+  login.elements.code.value = code; login.requestSubmit();
+  await waitFor(() => !doc.querySelector('#staff-workspace').hidden);
+  check('Correct code unlocks publishing', login.hidden && login.elements.code.value === '');
+  check('Session token is hidden from JavaScript', !doc.cookie.includes('p3h_staff'));
+  for (const language of ['en', 'zh']) {
+    doc.querySelector(`[data-language-button="${language}"]`).click();
+    for (const width of [390, 768, 1280]) {
+      frame.style.width = `${width}px`;
+      check(`Staff editor fits ${width}px in ${language}`, doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1);
+    }
+  }
+  doc.querySelector('[data-language-button="en"]').click();
+  frame.style.width = '100%';
+  const canvas = doc.createElement('canvas'); canvas.width = 40; canvas.height = 30;
+  canvas.getContext('2d').fillRect(0, 0, 40, 30);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  const files = new win.DataTransfer();
+  files.items.add(new win.File([blob], 'first.png', { type: 'image/png' }));
+  files.items.add(new win.File([blob], 'second.png', { type: 'image/png' }));
+  const input = doc.querySelector('#activity-photos'); input.files = files.files; input.dispatchEvent(new win.Event('change'));
+  check('Selected photos have previews and caption fields', doc.querySelectorAll('.photo-preview').length === 2);
+  const form = doc.querySelector('#activity-publish');
+  const title = '<img src=x onerror=window.injected=true> Browser test';
+  form.elements.title.value = title; form.elements.titleZh.value = '活动发布测试';
+  form.elements.date.value = '2026-11-25'; form.elements.description.value = 'Temporary fixture only.';
+  doc.querySelector('#photo-caption-0').value = 'First photo caption';
+  doc.querySelector('#photo-caption-1').value = 'Second photo caption';
+  doc.querySelector('#photo-caption-zh-0').value = '第一张照片';
+  doc.querySelector('#photo-caption-zh-1').value = '第二张照片';
+  form.elements.consent.checked = true;
+  const before = (await fetch('../api/activities').then(response => response.json())).activities.length;
+  form.requestSubmit();
+  await waitFor(() => status().includes('published and visible'));
+  const card = doc.querySelector('[data-published-activity]');
+  check('Published activity appears immediately', card?.querySelector('h2').textContent === title);
+  check('Uploaded title is rendered safely as text', !win.injected && !card.querySelector('h2 img'));
+  check('Publishing clears the completed form', form.elements.title.value === '' && !doc.querySelector('.photo-preview'));
+  card.querySelector('[data-direction="1"]').click();
+  check('New photo carousel works and updates captions', card.querySelector('.activity-photo-caption').textContent === 'Second photo caption');
+  check('New photo carousel has a live counter', card.querySelector('.activity-counter').textContent === 'Photo 2 of 2');
+  doc.querySelector('[data-language-button="zh"]').click();
+  check('Published activity supports Chinese titles and captions', doc.querySelector('[data-published-activity] h2').textContent === '活动发布测试' && doc.querySelector('.activity-photo-caption').textContent === '第二张照片');
+  const publicList = await fetch('../api/activities', { credentials: 'omit' }).then(response => response.json());
+  check('Visitors can see publications without staff login', publicList.activities.length === before + 1);
+  const media = await fetch(publicList.activities[0].photos[0].url, { credentials: 'omit' });
+  check('Uploaded photos are public JPEG images', media.ok && media.headers.get('content-type') === 'image/jpeg');
+  doc.querySelector('[data-language-button="en"]').click();
+  const uploaded = publicList.activities.find(item => item.title === title);
+  const manage = id => doc.querySelector(`[data-manage-id="${id}"]`);
+  const originalURLs = uploaded.photos.map(photo => photo.url);
+  manage(uploaded.id).querySelector('button').click();
+  check('Staff can edit an existing collection without uploading again', doc.querySelectorAll('.photo-preview').length === 2 && form.elements.title.value === title);
+  for (const width of [390, 768, 1280]) {
+    frame.style.width = `${width}px`;
+    check(`Photo editing controls fit ${width}px`, doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1);
+  }
+  frame.style.width = '100%';
+  doc.querySelector('#photo-caption-0').value = 'Updated first caption';
+  const replacement = new win.DataTransfer(); replacement.items.add(new win.File([blob], 'replacement.png', { type: 'image/png' }));
+  const replaceInput = doc.querySelector('.photo-preview input[type="file"]'); replaceInput.files = replacement.files; replaceInput.dispatchEvent(new win.Event('change'));
+  doc.querySelectorAll('.photo-preview')[1].querySelector('button').click();
+  check('Photo replacement and removal preserve entered captions', doc.querySelectorAll('.photo-preview').length === 1 && doc.querySelector('#photo-caption-0').value === 'Updated first caption');
+  form.elements.title.value = 'Edited browser activity'; form.elements.consent.checked = true;
+  form.requestSubmit(); await waitFor(() => status().includes('changes are saved'));
+  let updated = (await fetch('../api/activities').then(response => response.json())).activities.find(item => item.id === uploaded.id);
+  check('Saved edits replace the same activity rather than duplicate it', updated.title === 'Edited browser activity' && updated.photos.length === 1 && updated.photos[0].caption === 'Updated first caption');
+  check('Removed and replaced photo URLs stop working', (await Promise.all(originalURLs.map(url => fetch(url).then(response => response.status)))).every(code => code === 404));
+  manage(uploaded.id).querySelector('button').click();
+  doc.querySelector('.photo-preview button').click(); doc.querySelector('#cancel-activity-edit').click();
+  updated = (await fetch('../api/activities').then(response => response.json())).activities.find(item => item.id === uploaded.id);
+  check('Cancel editing leaves published photos unchanged', updated.photos.length === 1 && form.elements.title.value === '');
+  win.confirm = () => false;
+  manage(uploaded.id).querySelectorAll('button')[1].click();
+  check('Removing a collection requires confirmation', Boolean(manage(uploaded.id)));
+  win.confirm = () => true;
+  manage(uploaded.id).querySelectorAll('button')[1].click();
+  await waitFor(() => status().includes('have been removed'));
+  check('Removing a collection hides it from the public gallery', !doc.querySelector(`[data-published-activity="${uploaded.id}"]`));
+  const original = (await fetch('../api/activities').then(response => response.json())).activities.find(item => item.id === 'existing-event-0');
+  manage(original.id).querySelector('button').click();
+  check('Original website collections can also be edited', doc.querySelectorAll('.photo-preview').length === original.photos.length && form.elements.date.value === '');
+  doc.querySelector('.photo-preview button').click(); form.elements.consent.checked = true;
+  form.requestSubmit(); await waitFor(() => status().includes('changes are saved'));
+  check('Original photo removal also blocks the old asset URL', (await fetch(original.photos[0].url)).status === 404);
+  const homeFrame = document.createElement('iframe'); homeFrame.hidden = true; document.body.append(homeFrame);
+  await new Promise(resolve => { homeFrame.onload = resolve; homeFrame.src = '../index.html?lang=en'; });
+  await waitFor(() => homeFrame.contentDocument.querySelector('.home-activity img')?.src.endsWith(original.photos[1].url));
+  check('Homepage highlights use the edited collection photo', homeFrame.contentDocument.querySelector('.home-activity img').src.endsWith(original.photos[1].url));
+  manage(original.id).querySelectorAll('button')[1].click(); await waitFor(() => status().includes('have been removed'));
+  await new Promise(resolve => { homeFrame.onload = resolve; homeFrame.src = '../index.html?lang=en&refresh=1'; });
+  await waitFor(() => homeFrame.contentDocument.querySelector('.home-activity')?.hidden);
+  check('Removing an original collection hides its homepage highlight', homeFrame.contentDocument.querySelector('.home-activity').hidden);
+  check('Removed original collection photos are no longer public', (await fetch(original.photos[1].url)).status === 404);
+  homeFrame.remove();
+  const privateResponse = await fetch('../.p3h-data/staff-auth.json');
+  check('Private staff configuration cannot be downloaded', privateResponse.status === 403);
+  doc.querySelector('#staff-logout').click();
+  await waitFor(() => !doc.querySelector('#staff-login').hidden);
+  const rejected = await fetch('../api/activities', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-P3H-Request': 'staff' }, body: '{}' });
+  check('Signing out revokes permission to publish', rejected.status === 401);
+  output.textContent = `${checks.length} publishing browser checks passed.\n${checks.join('\n')}`;
+  document.body.dataset.complete = 'true';
+})().catch(error => { document.querySelector('#results').textContent += `\nFAIL: ${error.message}`; });
+</script></body></html>

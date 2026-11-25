@@ -28,7 +28,7 @@ a:hover { color: var(--orange-dark); }
 .brand { gap: 1rem; }
 .brand .programme-brand { display: flex; align-items: center; max-width: none; padding-left: 1rem; border-color: var(--line); }
 .brand .p3h-logo { width: 58px; height: 58px; object-fit: contain; flex-shrink: 0; }
-.brand .programme-brand img { width: 190px; }
+.brand .programme-brand img { width: 80px; height: auto; }
 .menu-toggle { background: transparent; border-color: var(--line); }
 .main-nav a, .nav-group summary { font-size: .85rem; padding: .6rem .75rem; }
 .main-nav a[aria-current="page"] { color: var(--orange-dark); background: var(--peach); }
@@ -82,7 +82,7 @@ a:hover { color: var(--orange-dark); }
 .card { background: #fff; padding: 1.75rem; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 5px 20px #49352c08; min-width: 0; }
 .card > :last-child { margin-bottom: 0; }
 .card p { max-width: 60ch; }
-.card > a:last-child { display: inline-block; margin-top: .5rem; font-weight: 600; }
+.card > a:last-child { font-weight: 600; }
 .resource-cards .card, .offer-card { display: flex; flex-direction: column; align-items: flex-start; }
 .resource-cards .card > a:last-child, .offer-card > a:last-child { margin-top: auto; }
 .grid > * { min-width: 0; }
@@ -119,7 +119,6 @@ a:hover { color: var(--orange-dark); }
 .spaced-heading { margin-top: 2.5rem; }
 .launch-banner { padding: 1.75rem 2rem; background: #fff6ed; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 2.5rem; }
 .launch-banner p { max-width: 49rem; }
-.wellness-grid { margin-top: 1.75rem; }
 .financial-support { margin-bottom: 2rem; scroll-margin-top: 110px; }
 .grant-grid { margin-top: 1.5rem; }
 .grant-category + .grant-category { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
@@ -198,14 +197,13 @@ html:not(.js) .menu-toggle { display: none; }
 .audience-info + .audience-info { margin-top: 1rem; }
 .support-contact { padding: 1.75rem; border-top: 1px solid var(--line); }
 @media (max-width: 480px) { .workspace-nav { gap: .4rem; } .workspace-nav a { padding: .6rem .7rem; font-size: .85rem; } }
-@media (min-width: 800px) { .wellness-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 800px) { .programme-summary { flex-direction: column; align-items: flex-start; gap: 1.25rem; } }
 @media (max-width: 760px) { .grid-3 { grid-template-columns: 1fr; } }
 @media (max-width: 480px) {
   .header-inner, .container { width: calc(100% - 2rem); }
   .brand { gap: .6rem; }
   .brand .programme-brand { padding-left: .6rem; }
-  .brand .programme-brand img { width: 140px; }
+  .brand .programme-brand img { width: 64px; }
   .brand .p3h-logo { width: 46px; height: 46px; }
   .section { padding: 2.5rem 0; }
   .card, .empty-state, .launch-banner { padding: 1.4rem; }
@@ -225,3 +223,71 @@ body { background: #fff; }
 .site-footer h3 { font-size: .875rem; letter-spacing: .05em; }
 .footer-bottom small { font-size: .875rem; }
 @media (max-width: 480px) { .header-inner, .container { width: calc(100% - 2rem); } }
+
+/* Shared layout rhythm across all public pages. */
+@media screen {
+  .header-inner, .container {
+    width: min(var(--content-width), calc(100% - 2 * var(--page-gutter)));
+  }
+  .container .container { width: 100%; }
+  .section, .section + .section, .home-section, .journey-start, .journey-section {
+    padding-block: var(--section-padding);
+  }
+  .section .section { padding-block: var(--space-4); }
+  .page-hero { padding-block: var(--section-padding); }
+  .page-hero > .container { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+  .page-hero > .container > * { margin-block: 0; }
+  .section-heading, .home-heading, .community-heading { margin-bottom: var(--space-4); }
+  .section-heading > p { max-width: 44rem; }
+  .grid, .path-grid, .home-activity-grid, .activity-grid, .contact-layout, .journey-layout, .accordion {
+    gap: var(--grid-gap);
+  }
+  .card, .empty-state, .help-panel, .journey-young, .journey-next, .launch-banner {
+    padding: var(--card-padding);
+  }
+  .grid > .card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  .grid > .card > * { margin-block: 0; }
+  .grid > .card > a:last-child { margin-top: auto; }
+  .card h2, .card h3, .grant-category .card h3, .activity-caption h2,
+  .path-card h3, .home-activity h3 {
+    font-size: var(--card-title-size);
+    line-height: 1.35;
+    font-weight: 650;
+  }
+  .home-section h2 { font-size: clamp(1.6rem, 2.8vw, 2.2rem); }
+  .button { line-height: 1.5; text-align: center; white-space: normal; }
+  .button-row { align-items: stretch; gap: var(--space-2); }
+  .button-row > .button, .journey-card > .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .activity-caption, .home-activity > div, .path-card.button { padding: var(--card-padding); }
+  .path-card.button, .home-activity > div { gap: var(--space-2); }
+  .home-activity > div > *, .path-card > * { margin-block: 0; }
+  .path-card .path-label, .home-activity div > span { margin-top: auto; }
+  .activity-card { min-width: 0; }
+  .activity-caption h2 { margin-bottom: var(--space-2); }
+  .offer-card p, .path-card p, .home-activity p:not(.eyebrow), .support-option summary span {
+    font-size: 1rem;
+  }
+  .support-option summary, .audience-disclosure > summary { padding: var(--card-padding); }
+  .faq-item, .faq-item:last-child { padding-inline: var(--card-padding); }
+  .faq-item summary { padding-block: var(--card-padding); }
+  .faq-item p { padding-bottom: var(--card-padding); }
+  .support-option-body { padding: 0 var(--card-padding) var(--card-padding); }
+  .audience-disclosure > :not(summary) { margin-inline: var(--card-padding); }
+  .support-contact { padding: var(--card-padding) 0; }
+  .home-shortcuts > .container { width: min(var(--content-width), calc(100% - 2 * var(--page-gutter))); }
+}
+@media screen and (max-width: 760px) {
+  :root { --page-gutter: 1rem; --card-padding: 1.5rem; }
+  .journey-card > .button { width: 100%; }
+  .home-shortcuts > .container { grid-template-columns: 1fr; }
+  .home-shortcuts a { border-inline: 0; }
+}

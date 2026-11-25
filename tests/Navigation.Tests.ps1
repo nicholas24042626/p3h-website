@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$canonical = @('index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html')
+$canonical = @('index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html')
 $allPages = Get-ChildItem -LiteralPath $root -Filter '*.html' -File
 $allPages += Get-ChildItem -LiteralPath (Join-Path $root 'streams') -Filter '*.html' -File
 $checks = 0
@@ -23,7 +23,8 @@ foreach ($file in $allPages) {
         $url = [Net.WebUtility]::HtmlDecode($link.Groups[1].Value)
         if ($url -match '^(https?:|mailto:|tel:|data:)') { continue }
         $parts = $url.Split('#')
-        $target = if ($parts[0]) { [IO.Path]::GetFullPath((Join-Path $file.DirectoryName ([Uri]::UnescapeDataString($parts[0])))) } else { $file.FullName }
+        $localPath = ($parts[0] -split '\?')[0]
+        $target = if ($localPath) { [IO.Path]::GetFullPath((Join-Path $file.DirectoryName ([Uri]::UnescapeDataString($localPath)))) } else { $file.FullName }
         Assert (Test-Path -LiteralPath $target -PathType Leaf) "$($file.Name): broken local URL $url"
         if ($parts.Count -gt 1 -and $parts[1]) {
             $targetHtml = [IO.File]::ReadAllText($target)
@@ -47,10 +48,10 @@ foreach ($page in $canonical) {
     Assert ($html -notmatch 'data-legacy-route') "$page marked as a compatibility route"
 }
 $support = [IO.File]::ReadAllText((Join-Path $root 'assistance.html'))
-Assert (([regex]::Matches($support, 'data-workspace-panel')).Count -eq 5) 'Expected five support sections'
+Assert (([regex]::Matches($support, 'data-workspace-panel')).Count -eq 4) 'Expected four support sections'
 Assert (([regex]::Matches($support, 'class="card grant-card ')).Count -eq 7) 'All seven grants must be retained'
 Assert (([regex]::Matches($support, 'class="card scheme-card ')).Count -eq 8) 'All eight non-grant services must be retained'
 Assert (([regex]::Matches($support, 'class="support-option"')).Count -eq 4) 'All four support areas must be retained'
 Assert (([regex]::Matches($support, '<h3>Seniors')).Count -eq 1) 'SMF must have only one catalogue entry'
-Assert ($support -notmatch 'hidden[ >]') 'Source sections must remain available without JavaScript'
-Write-Output "PASS: $checks navigation, content, file, fragment and structure checks across 16 public routes."
+Assert ($support -notmatch '<section[^>]*data-workspace-panel[^>]*\shidden[ >]') 'Source sections must remain available without JavaScript'
+Write-Output "PASS: $checks navigation, content, file, fragment and structure checks across $($allPages.Count) public routes."
