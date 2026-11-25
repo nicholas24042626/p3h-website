@@ -1,0 +1,27 @@
+{
+    "articles":  [
+                     {
+                         "date":  "2026-11-20",
+                         "title":  "Elderly Wound Care at Home",
+                         "url":  "https://www.carershub.sg/articles/elderly-wound-care-at-home",
+                         "author":  "Home Nursing Foundation",
+                         "image":  "https://www.carershub.sg/frontend/web/cache/2757/1500x742/ElderlySkinandWoundCareatHome_Image11794554523.png"
+                     },
+                     {
+                         "date":  "2026-11-13",
+                         "title":  "Understanding Self-Care, Managing Stress, and Avoiding Burnout",
+                         "url":  "https://www.carershub.sg/articles/understanding-self-care-managing-stress-and-avoiding-burnout",
+                         "author":  "Home Nursing Foundation",
+                         "image":  "https://www.carershub.sg/frontend/web/cache/2756/1500x742/BeatingBurnoutAndPractisingSelf-Care_Image11794539566.png"
+                     },
+                     {
+                         "date":  "2026-11-06",
+                         "title":  "5 Wheelchair-Friendly Nature Walks in Singapore",
+                         "url":  "https://www.carershub.sg/articles/5-wheelchair-friendly-nature-walks-in-singapore",
+                         "author":  "Home Nursing Foundation",
+                         "image":  "https://www.carershub.sg/frontend/web/cache/2687/1500x742/HNF_OptInfographic4_3MB1793061375.png"
+                     }
+                 ],
+    "schemaVersion":  2,
+    "checkedAt":  "2026-11-25T06:23:19.8789987+00:00"
+}

@@ -1,0 +1,73 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Live article checks</title></head><body>
+<h1>Live article checks</h1><pre id="results">Running...</pre><iframe title="Article feed under test" style="width:1280px;height:1100px;border:0"></iframe>
+<script>
+(async () => {
+  const frame = document.querySelector('iframe'), out = document.querySelector('#results'), checks = [];
+  const check = (name, ok) => { if (!ok) throw new Error(name); checks.push(`PASS: ${name}`); out.textContent = checks.join('\n'); };
+  const waitFor = async fn => { for (let i = 0; i < 100; i++) { if (fn()) return; await new Promise(resolve => setTimeout(resolve, 50)); } throw new Error('Timed out'); };
+  const feed = { checkedAt: new Date().toISOString(), status: 'fresh', articles: [
+    { title: 'Older caregiver article', date: '2026-11-06', author: 'Care Team', url: 'https://www.carershub.sg/articles/older' },
+    { title: '<img src=x onerror=window.injected=true> Latest article', date: '2026-11-20', author: 'Home Nursing Foundation', url: 'https://www.carershub.sg/articles/latest' },
+    { title: 'Middle article', date: '2026-11-13', author: 'Care Team', url: 'https://www.carershub.sg/articles/middle' }
+  ] };
+  const snapshot = await fetch('../assets/data/carershub-articles.json').then(response => response.json());
+  feed.articles.forEach((article, index) => { article.image = snapshot.articles[index].image; });
+  let mode = 'fresh', calls = [], visit = 0;
+  window.articleFetch = async (url, options) => {
+    const path = new URL(url).pathname; calls.push({ path, credentials: options.credentials });
+    if (mode === 'offline') throw new Error('Offline');
+    if ((mode === 'fallback' || mode === 'unsafe') && path === '/api/articles') {
+      if (mode === 'fallback') throw new Error('API unavailable');
+      const unsafe = JSON.parse(JSON.stringify(feed)); unsafe.articles[0].url = 'javascript:alert(1)'; return { ok: true, json: async () => unsafe };
+    }
+    return { ok: true, json: async () => JSON.parse(JSON.stringify(feed)) };
+  };
+  async function load() {
+    await new Promise(resolve => {
+      frame.onload = resolve;
+      frame.src = `articles-frame.html?lang=en&case=${++visit}`;
+    });
+    await waitFor(() => frame.contentDocument.querySelector('#article-status').textContent && !frame.contentDocument.querySelector('#article-status').textContent.includes('Loading'));
+    return frame.contentDocument;
+  }
+  let doc = await load();
+  check('Exactly three articles are rendered', doc.querySelectorAll('.article-card').length === 3);
+  check('Each article displays its matching thumbnail', doc.querySelectorAll('.article-thumbnail').length === 3);
+  const preview = doc.querySelector('.article-thumbnail'); preview.dispatchEvent(new frame.contentWindow.Event('error'));
+  check('Missing source pictures have a clean fallback', !doc.querySelector('.article-card').querySelector('.article-thumbnail') && !doc.querySelector('.article-image-fallback').hidden);
+  check('Latest publication date comes first', doc.querySelector('.article-card time').dateTime === '2026-11-20');
+  check('Source titles are plain text, never executable HTML', !frame.contentWindow.injected && !doc.querySelector('.article-card h3 img') && doc.querySelector('.article-card h3').textContent.includes('<img'));
+  check('Published date and author are attributed', doc.querySelector('.article-author').textContent.includes('Home Nursing Foundation'));
+  check('External articles open safely on Carers Hub', [...doc.querySelectorAll('.article-card a')].every(link => link.hostname === 'www.carershub.sg' && link.target === '_blank' && link.rel.includes('noopener')));
+  check('Public feed never sends staff cookies', calls.every(call => call.credentials === 'omit'));
+  const headline = doc.querySelector('.article-card h3').textContent;
+  for (const language of ['en', 'zh']) {
+    doc.querySelector(`[data-language-button="${language}"]`).click();
+    for (const width of [1280, 768, 390]) { frame.style.width = `${width}px`; check(`Article cards fit ${width}px in ${language}`, doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1); }
+  }
+  check('Chinese controls preserve original article headlines', doc.querySelector('.article-card h3').textContent === headline && doc.querySelector('.article-card a').textContent.includes('在 Carers Hub 阅读'));
+  doc.querySelector('[data-language-button="en"]').click();
+  const link = doc.querySelector('.article-card a'); link.focus(); frame.contentWindow.articleTick();
+  await waitFor(() => calls.length >= 2);
+  await new Promise(resolve => setTimeout(resolve, 80));
+  check('Background refresh preserves keyboard focus', doc.activeElement === link);
+  mode = 'offline'; frame.contentWindow.articleTick();
+  await waitFor(() => doc.querySelector('#article-status').textContent.includes('Showing saved'));
+  check('Connection failure keeps the previous three articles', doc.querySelectorAll('.article-card').length === 3);
+  check('An outage is clearly labelled as saved content', doc.querySelector('#article-status').textContent.includes('Showing saved'));
+  mode = 'fallback'; calls = []; doc = await load();
+  check('Static fallback works when the API is unavailable', calls.some(call => call.path.endsWith('/carershub-articles.json')) && doc.querySelectorAll('.article-card').length === 3);
+  check('Static fallback is never described as a fresh live check', doc.querySelector('#article-status').textContent.includes('Showing saved'));
+  mode = 'unsafe'; calls = []; doc = await load();
+  check('Unsafe upstream links are rejected in favour of the safe fallback', !doc.querySelector('a[href^="javascript:"]') && calls.some(call => call.path.endsWith('/carershub-articles.json')));
+  mode = 'offline'; doc = await load();
+  check('Total outage gives a useful message without invented stories', doc.querySelectorAll('.article-card').length === 0 && doc.querySelector('#article-status').textContent.includes('temporarily unavailable'));
+  await new Promise(resolve => { frame.onload = resolve; frame.src = '../resources.html?lang=en#latest-articles'; });
+  doc = frame.contentDocument;
+  await waitFor(() => doc.querySelectorAll('.article-thumbnail').length === 3);
+  doc.querySelectorAll('.article-thumbnail').forEach(image => { image.loading = 'eager'; });
+  await waitFor(() => [...doc.querySelectorAll('.article-thumbnail')].length === 3 && [...doc.querySelectorAll('.article-thumbnail')].every(image => image.complete && image.naturalWidth > 0));
+  check('All three real publisher thumbnails load on Resources', [...doc.querySelectorAll('.article-thumbnail')].every(image => image.naturalWidth > 0));
+  out.textContent = `${checks.length} live article browser checks passed.\n${checks.join('\n')}`; document.body.dataset.complete = 'true';
+})().catch(error => { document.querySelector('#results').textContent += `\nFAIL: ${error.stack}`; });
+</script></body></html>

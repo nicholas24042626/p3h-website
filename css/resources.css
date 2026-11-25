@@ -1,1 +1,13 @@
 .resource-list { padding-left: 1.2rem; }
+.carershub-news { background: #faf8f6; }
+.carershub-news .section-heading > p { max-width: 48rem; }
+.carershub-news .article-card { gap: var(--space-2); }
+.article-media { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: var(--peach); }
+.article-thumbnail { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.article-image-fallback { display: grid; place-items: center; width: 100%; height: 100%; color: var(--orange-dark); font-weight: 600; }
+.article-card .article-date, .article-card .article-author { color: var(--muted); font-size: .9375rem; }
+.article-card .article-author { overflow-wrap: anywhere; }
+.article-card a { padding-top: var(--space-2); }
+.articles-browse { margin: var(--space-3) 0 0; }
+#article-status:not(:empty) { margin-bottom: var(--space-3); }
+#latest-article-cards:empty { display: none; }

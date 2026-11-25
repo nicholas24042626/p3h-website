@@ -16,6 +16,14 @@ For another port, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\Sta
 
 Open `tests/eligibility.html` on the local server to check age/ADL/income boundaries, PR family conditions, uncertain answers, safe matching, privacy, reset, language switching, print and responsive results. The new page is included in the shared navigation, language and layout checks.
 
+## Live Carers Hub articles
+
+Resources & FAQs includes the three newest dated articles from Carers Hub's Singapore caregiver article library. `Articles-Api.ps1` reads the fixed public `https://www.carershub.sg/articles` index, extracts titles/publication dates/authors/canonical article links and matching publisher thumbnails, deduplicates them and sorts by publication date. Future dates, offsite links and invalid records are rejected. It does not copy article bodies or image files, import third-party scripts, or share user accounts or cookies. Thumbnail URLs are restricted to Carers Hub's public raster image paths; unavailable images show a neutral fallback without breaking the cards.
+
+`GET /api/articles` is public. Successful results are cached privately in `.p3h-data/carershub-articles.json` for one hour; requests after expiry refresh the index, with a ten-minute retry backoff after failures. The last valid result survives outages and restarts. The UI checks the endpoint on load and periodically while visible, labels saved results honestly, and shows the last successful check time in Singapore time. Article titles stay in their original English while surrounding controls and dates follow the site's language switch.
+
+`assets/data/carershub-articles.json` is a public fallback snapshot. Refresh it manually with `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\Refresh-ArticleSnapshot.ps1`. Static-only hosting shows this dated fallback; automatic updates require hosting the article backend too. If Carers Hub changes its index markup, update the parser; failed parsing preserves the cache rather than replacing it with incomplete results. Run `tests/Articles-Api.Tests.ps1` and open `/tests/articles.html` for parsing, cache, outage, safety, language and mobile checks.
+
 ## Staff activity publishing
 
 Open Activities, choose **Staff access**, enter the configured code and sign in. Add the activity title and date, choose up to six JPEG or PNG photos (3 MB each), add a caption for every photo, confirm approval for public sharing, then choose **Publish photos**. Chinese titles, descriptions and captions are optional. Published photos appear for all visitors, including after a server restart. Existing photo collections remain available.

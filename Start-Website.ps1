@@ -4,8 +4,10 @@ $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath($PSScriptRoot)
 . (Join-Path $root 'Chatbot-Api.ps1')
 . (Join-Path $root 'Activities-Api.ps1')
+. (Join-Path $root 'Articles-Api.ps1')
 if (-not $ActivityDataDirectory) { $ActivityDataDirectory = Join-Path $root '.p3h-data' }
 $activityState = New-P3HActivityState -DataDirectory $ActivityDataDirectory -AllowedOrigins @("http://localhost:$Port", "http://127.0.0.1:$Port") -WebsiteRoot $root
+$articleState = New-P3HArticleState -DataDirectory $ActivityDataDirectory -WebsiteRoot $root
 $chatRequests = [Collections.Generic.Queue[datetime]]::new()
 $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, $Port)
 $types = @{
@@ -50,7 +52,16 @@ try {
             $type = 'text/plain; charset=utf-8'
             $route = ($parts[1] -split '\?')[0]
             $extraHeaders = ''
-            if ($route -match '^/(?:api/(?:staff(?:/|$)|activities(?:/|$))|media/activities/)') {
+            if ($route -eq '/api/articles' -and $parts[0] -in @('GET', 'HEAD')) {
+                $type = 'application/json; charset=utf-8'
+                $feed = Get-P3HLatestArticles -State $articleState
+                if ($feed.status -eq 'unavailable') { $status = '503 Service Unavailable' }
+                $body = [Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $feed -Depth 8 -Compress))
+            } elseif ($route -eq '/assets/data/carershub-articles.json' -and $parts[0] -in @('GET', 'HEAD')) {
+                $type = 'application/json; charset=utf-8'
+                if ([IO.File]::Exists((Join-Path $root 'assets/data/carershub-articles.json'))) { $body = [IO.File]::ReadAllBytes((Join-Path $root 'assets/data/carershub-articles.json')) }
+                else { $status = '404 Not Found'; $body = [Text.Encoding]::UTF8.GetBytes('{}') }
+            } elseif ($route -match '^/(?:api/(?:staff(?:/|$)|activities(?:/|$))|media/activities/)') {
                 $requestHeaders = @{}
                 foreach ($line in ($headerText -split "`r`n" | Select-Object -Skip 1)) {
                     if (-not $line) { continue }
