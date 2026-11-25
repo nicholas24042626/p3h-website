@@ -1,0 +1,27 @@
+/* Caregiver Resources directory page. Follows the site's card, filter
+   and category conventions from assistance.html / refinements.css. */
+.resource-search { margin-bottom: 1rem; }
+.resource-search label { margin-bottom: .35rem; }
+.resource-filter-row { margin-bottom: 1rem; }
+.resource-filter-row label { margin-bottom: .35rem; }
+.resource-category + .resource-category { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.resource-category > h2 { font-size: clamp(1.4rem, 2.5vw, 1.8rem); margin-bottom: 0; }
+.resource-count { font-size: .85rem; color: var(--muted); font-weight: 600; }
+.resource-grid { margin-top: 1.5rem; }
+.resource-card { display: flex; gap: 1rem; align-items: flex-start; }
+.resource-logo { flex: none; width: 96px; padding-top: .25rem; }
+.resource-logo img { display: block; max-width: 96px; max-height: 64px; width: auto; height: auto; object-fit: contain; }
+.resource-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.resource-card-body .eyebrow { margin-bottom: .5rem; }
+.resource-card-body h3 { font-size: 1.2rem; margin: 0 0 .5rem; }
+.resource-card-body p { font-size: .95rem; }
+.resource-card-body > a:last-child { margin-top: auto; padding-top: .5rem; font-size: .9rem; color: var(--orange-dark); font-weight: 600; }
+.resource-pagination { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: 2rem; }
+.resource-pagination:empty { display: none; }
+.resource-page-btn { min-height: 42px; padding: .45rem .9rem; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; }
+.resource-page-btn:hover { border-color: var(--orange-dark); }
+.resource-page-btn.is-active { border-color: var(--blue-900); background: var(--blue-900); color: var(--white); }
+.resource-page-btn:disabled { opacity: .45; cursor: default; }
+.resource-page-btn:disabled:hover { border-color: var(--line); }
+.caregiver-resources-teaser .scheme-key { margin: 1rem 0; }
+.caregiver-resources-teaser .button { margin-top: .25rem; }
