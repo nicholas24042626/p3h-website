@@ -6,10 +6,11 @@ $destinations = @(
     @('home', 'index.html', 'Home'),
     @('assistance', 'assistance.html', 'Caregiver support'),
     @('activities', 'activities.html', 'Activities'),
+    @('eligibility', 'eligibility.html', 'Eligibility'),
     @('resources', 'resources.html', 'Resources &amp; FAQs'),
     @('contact', 'contact.html', 'Contact')
 )
-$pages = @('index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html')
+$pages = @('index.html', 'assistance.html', 'activities.html', 'eligibility.html', 'resources.html', 'contact.html', 'caregiving-journey.html')
 $routeHomes = @{
     'how-we-help.html' = 'assistance.html#financial-support'
     'programmes.html' = 'assistance.html#training-programmes'
@@ -111,4 +112,17 @@ foreach ($alias in $aliases) {
     }
     [IO.File]::WriteAllText((Join-Path $root $alias[0]), $html, $utf8)
 }
-Write-Output 'Updated six canonical pages and eleven compatibility routes.'
+# The standalone directory shares navigation but keeps its own English content.
+$directoryPath = Join-Path $root 'caregiver-resources.html'
+if (Test-Path -LiteralPath $directoryPath) {
+    $directory = [IO.File]::ReadAllText($directoryPath)
+    $links = foreach ($item in $destinations) {
+        $active = if ($item[0] -eq 'resources') { ' aria-current="page"' } else { '' }
+        $class = if ($item[0] -eq 'contact') { ' class="nav-contact"' } else { '' }
+        "<li><a$class data-page-link=`"$($item[0])`" href=`"$($item[1])`"$active>$($item[2])</a></li>"
+    }
+    $nav = '<nav class="main-nav" id="main-nav" aria-label="Main navigation"><ul>' + ($links -join "`n") + '</ul></nav>'
+    $directory = [regex]::Replace($directory, '(?s)<nav class="main-nav".*?</nav>', [Text.RegularExpressions.MatchEvaluator]{ param($m) $nav })
+    [IO.File]::WriteAllText($directoryPath, $directory, $utf8)
+}
+Write-Output 'Updated seven canonical pages, eleven compatibility routes and directory navigation.'

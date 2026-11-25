@@ -1,0 +1,87 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Eligibility checks</title></head>
+<body><h1>Eligibility checks</h1><pre id="results">Running...</pre><iframe title="Eligibility under test" style="width:1280px;height:1000px;border:0"></iframe>
+<script>
+(async () => {
+  const frame = document.querySelector('iframe'), output = document.querySelector('#results'), results = [];
+  function check(name, ok) { if (!ok) throw new Error(name); results.push(`PASS: ${name}`); output.textContent = results.join('\n'); }
+  await new Promise(resolve => { frame.onload = resolve; frame.src = '../eligibility.html?lang=en'; });
+  const doc = frame.contentDocument, win = frame.contentWindow, api = win.P3HEligibility;
+  const independent = { washing: 'independent', dressing: 'independent', feeding: 'independent', toileting: 'independent', mobility: 'independent', transferring: 'independent' };
+  const help = { ...independent, washing: 'some', dressing: 'full', toileting: 'some' };
+  const base = { role: 'current', caregiverAge: 45, recipientAge: 70, citizenship: 'sc', residence: 'home', duration: 'assessed', disability: 'no', income: 'low', adls: help, needs: ['money', 'equipment', 'training'] };
+  const status = (id, overrides = {}) => api.recommend({ ...base, ...overrides }).schemes.find(item => item.id === id).status;
+  check('All six ADLs start unknown, not independent', api.summariseADLs().unknown === 6);
+  check('Some and full help both count toward assistance', api.summariseADLs(help).help === 3);
+  check('Three reported ADLs and matching basics shortlist HCG', status('hcg') === 'possible');
+  check('Fewer than three known help needs do not shortlist HCG', status('hcg', { adls: { ...independent, washing: 'some', dressing: 'some' } }) === 'different');
+  check('Unanswered ADLs remain uncertain', status('hcg', { adls: { ...help, toileting: 'unknown' } }) === 'review');
+  check('Temporary help is not treated as permanent HCG need', status('hcg', { duration: 'temporary' }) === 'different');
+  check('Unassessed ongoing help needs checking', status('hcg', { duration: 'ongoing' }) === 'review');
+  check('PR with qualifying living SC family can explore HCG', status('hcg', { citizenship: 'pr', family: 'yes' }) === 'possible');
+  check('PR without qualifying family does not shortlist HCG', status('hcg', { citizenship: 'pr', family: 'no' }) === 'different');
+  check('Unknown PR family status needs checking', status('hcg', { citizenship: 'pr', family: 'unknown' }) === 'review');
+  check('PR family restriction is not incorrectly applied to SMF', status('smf', { citizenship: 'pr', family: 'no' }) === 'possible');
+  check('Citizenship unknown is never silently accepted', status('hcg', { citizenship: 'unknown' }) === 'review');
+  check('HCG is not shortlisted for residential long-term care', status('hcg', { residence: 'residential' }) === 'different');
+  check('SMF is not shortlisted for nursing-home residence', status('smf', { residence: 'nursing' }) === 'different');
+  check('HCG has no invented minimum age', status('hcg', { recipientAge: 8 }) === 'possible');
+  check('SMF includes age 60', status('smf', { recipientAge: 60 }) === 'possible');
+  check('SMF age 59 does not meet the age rule', status('smf', { recipientAge: 59 }) === 'different');
+  check('CTG includes age 65 without ADL needs', status('ctg', { recipientAge: 65, adls: independent }) === 'possible');
+  check('CTG age 64 needs a disability route', status('ctg', { recipientAge: 64, adls: independent }) === 'different');
+  check('CTG younger assessed ADL disability route is retained', status('ctg', { recipientAge: 30 }) === 'possible');
+  check('Reported disability benefits require provider checking', status('ctg', { recipientAge: 30, adls: independent, disability: 'yes' }) === 'review');
+  check('Upper income band through S$4800 remains included', status('hcg', { income: 'upper' }) === 'possible');
+  check('Above S$4800 is not shortlisted for HCG', status('hcg', { income: 'above' }) === 'different');
+  check('No-income households need a property value', status('hcg', { income: 'none', property: null }) === 'review');
+  check('Below annual-value boundary can be shortlisted', status('hcg', { income: 'none', property: 20999 }) === 'possible');
+  check('Annual-value boundary goes to AIC for confirmation', status('hcg', { income: 'none', property: 21000 }) === 'review');
+  check('Above annual-value threshold is not shortlisted', status('hcg', { income: 'none', property: 21001 }) === 'different');
+  check('Preparing caregivers receive guidance and cautious grant status', status('hcg', { role: 'preparing' }) === 'review' && api.recommend({ ...base, role: 'preparing' }).resources.some(item => item.id === 'training'));
+  check('Gender never excludes grant or resource suggestions', JSON.stringify(api.recommend({ ...base, gender: 'woman' })) === JSON.stringify(api.recommend({ ...base, gender: 'man' })));
+  check('Financial pressure is referred even above grant income limits', api.recommend({ ...base, income: 'above', difficulty: 'yes' }).resources.some(item => item.id === 'comcare'));
+  check('Young caregivers get their own guidance', api.recommend({ ...base, caregiverAge: 16 }).resources.some(item => item.id === 'young'));
+  check('Lower-income households receive an SSO resource without selecting extra topics', api.recommend({ ...base, income: 'low', needs: [] }).resources.some(item => item.id === 'comcare'));
+  check('A young care recipient is not automatically labelled a caregiver', !api.recommend({ ...base, role: 'self', caregiverAge: 16 }).resources.some(item => item.id === 'young'));
+  check('South West resource respects district selection', api.recommend({ ...base, district: 'southwest' }).resources.some(item => item.id === 'southwest') && !api.recommend({ ...base, district: 'other' }).resources.some(item => item.id === 'southwest'));
+  check('Every grant has an official source', api.recommend(base).schemes.every(item => item.url.startsWith('https://www.aic.sg/')));
+  const set = (id, value) => { doc.getElementById(id).value = value; doc.getElementById(id).dispatchEvent(new win.Event('change', { bubbles: true })); };
+  const form = doc.querySelector('#eligibility-form');
+  let requests = 0; win.fetch = () => { requests++; return Promise.reject(new Error('Unexpected transmission')); };
+  check('Form controls have no query-submittable names', !form.querySelector('[name]'));
+  check('The current menu is Eligibility, immediately after Activities', doc.querySelector('nav [aria-current="page"]').dataset.pageLink === 'eligibility' && doc.querySelector('[data-page-link="activities"]').closest('li').nextElementSibling.querySelector('a').dataset.pageLink === 'eligibility');
+  set('care-role', 'preparing'); form.requestSubmit();
+  check('Partial answers produce useful provisional results', !doc.querySelector('#eligibility-results').hidden && doc.querySelector('[data-option-id="journey"]'));
+  check('Results heading receives focus', doc.activeElement.id === 'results-heading');
+  check('Unknown answers do not claim a confirmed match', !doc.querySelector('#matched-options [data-match-status="possible"]'));
+  set('care-role', 'current');
+  check('Changed answers hide stale recommendations', doc.querySelector('#eligibility-results').hidden && doc.querySelector('#eligibility-changed').textContent.includes('answers changed'));
+  set('recipient-citizenship', 'pr'); check('PR family question is shown', !doc.querySelector('#family-row').hidden);
+  set('household-income', 'none'); check('No-income annual-value question is shown', !doc.querySelector('#property-row').hidden && !doc.querySelector('#property-value').disabled);
+  set('recipient-citizenship', 'sc'); set('household-income', 'low');
+  set('recipient-age', '70'); set('recipient-residence', 'home'); set('recipient-duration', 'assessed'); set('recipient-disability', 'no');
+  doc.querySelector('#adl-independent').click();
+  check('All-independent shortcut updates all six controls', [...doc.querySelectorAll('[data-adl]')].every(input => input.value === 'independent'));
+  for (const key of ['washing', 'dressing', 'toileting']) set(`adl-${key}`, 'some');
+  doc.querySelector('[data-need][value="equipment"]').checked = true;
+  form.requestSubmit();
+  check('Matching details render HCG as worth exploring', doc.querySelector('#matched-options [data-option-id="hcg"]').dataset.matchStatus === 'possible');
+  for (const language of ['en', 'zh']) {
+    doc.querySelector(`[data-language-button="${language}"]`).click();
+    for (const width of [1280, 768, 390]) {
+      frame.style.width = `${width}px`;
+      check(`Form and results fit ${width}px in ${language}`, doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1);
+    }
+    check(`Internal result links preserve ${language}`, [...doc.querySelectorAll('#matched-options a')].filter(link => link.origin === win.location.origin).every(link => new URL(link.href).searchParams.get('lang') === language));
+  }
+  check('Results and ADL summary translate into Chinese', doc.querySelector('#matched-options').textContent.includes('居家看护津贴') && doc.querySelector('#adl-summary').textContent.includes('3项需要协助'));
+  let printed = 0; win.print = () => printed++; doc.querySelector('#print-options').click(); check('Printing is user initiated', printed === 1);
+  check('Answers never triggered a network submission', requests === 0);
+  check('URL contains only the language preference', [...new URL(win.location.href).searchParams.keys()].every(key => key === 'lang'));
+  check('No profile is saved to browser storage', !Object.keys(win.localStorage).some(key => /eligibility|recipient|income|adl|profile/i.test(key)));
+  form.reset(); await new Promise(resolve => setTimeout(resolve, 30));
+  check('Clear answers resets inputs, summary and results', doc.querySelector('#eligibility-results').hidden && doc.querySelector('#recipient-age').value === '' && doc.querySelectorAll('[data-need]:checked').length === 0 && [...doc.querySelectorAll('[data-adl]')].every(input => input.value === 'unknown'));
+  output.textContent = `${results.length} eligibility checks passed.\n${results.join('\n')}`;
+  document.body.dataset.complete = 'true';
+})().catch(error => { document.querySelector('#results').textContent += `\nFAIL: ${error.stack}`; });
+</script></body></html>

@@ -1,0 +1,56 @@
+.eligibility-layout { max-width: var(--content-width); }
+.eligibility-guidance { max-width: 52rem; margin-bottom: var(--space-4); }
+.eligibility-privacy { padding: var(--space-2); border-left: 3px solid var(--orange-dark); background: var(--peach); }
+.eligibility-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: white; table-layout: fixed; }
+.eligibility-table caption { text-align: left; font-size: 1.35rem; font-weight: 650; line-height: 1.4; margin-bottom: var(--space-2); color: var(--ink); }
+.eligibility-table th, .eligibility-table td { padding: var(--space-3); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.eligibility-table tbody tr + tr > * { border-top: 1px solid var(--line); }
+.eligibility-table tbody th { width: 34%; background: #faf8f6; font-weight: 600; }
+.eligibility-table thead th { background: var(--peach); border-bottom: 1px solid var(--line); font-weight: 600; }
+.eligibility-table label { font-weight: 600; }
+.eligibility-table input, .eligibility-table select { min-width: 0; max-width: 100%; min-height: 44px; }
+.eligibility-table select { appearance: none; padding-right: 2.25rem; background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%2349352c' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right .75rem center / .75rem; }
+.eligibility-table input[type="number"] { max-width: 18rem; }
+.field-help { font-size: .9375rem; color: var(--muted); margin: .75rem 0 0; }
+.adl-section { border: 0; padding: 0; margin: 0 0 var(--space-4); min-width: 0; }
+.adl-section > legend { font-size: 1.35rem; font-weight: 650; margin-bottom: var(--space-2); color: var(--ink); }
+.adl-section > p { max-width: 65ch; }
+.adl-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: var(--space-3) 0; }
+.adl-actions p { margin: 0; }
+.adl-table { margin-bottom: 0; }
+.adl-table tbody th { width: auto; }
+.support-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); border: 0; padding: 0; margin: 0; min-width: 0; }
+.support-choices label { display: flex; align-items: flex-start; gap: .75rem; font-weight: 400; }
+.support-choices input { width: 1.2rem; height: 1.2rem; min-height: 0; flex-shrink: 0; margin-top: .3rem; accent-color: var(--orange-dark); }
+.eligibility-form-actions { margin-top: 0; }
+#eligibility-changed { margin-top: var(--space-2); color: var(--orange-dark); }
+.eligibility-results { padding-top: var(--space-5); margin-top: var(--space-5); border-top: 1px solid var(--line); }
+.eligibility-results .section-heading > p { max-width: 55rem; }
+.eligibility-results h3 { font-size: 1.25rem; }
+.match-table col:first-child { width: 26%; }
+.match-table td > :last-child, .match-table th > :last-child { margin-bottom: 0; }
+.match-table th { background: #faf8f6; }
+.match-table .match-status { display: inline-block; font-size: .875rem; font-weight: 600; margin-top: .75rem; padding: .25rem .6rem; border-radius: 5px; background: #eef3ef; color: #34513c; }
+.match-table .match-status.review { background: #fff0df; color: #80501e; }
+.match-table p + p { margin-top: var(--space-2); }
+.match-table a { font-weight: 600; }
+.eligibility-next { background: var(--peach); padding: var(--card-padding); border: 1px solid var(--line); border-radius: var(--radius); margin-top: var(--space-4); }
+.eligibility-review { max-width: 65ch; margin-top: var(--space-4); }
+@media (max-width: 760px) {
+  .eligibility-table, .eligibility-table tbody, .eligibility-table tr, .eligibility-table td, .eligibility-table th { display: block; width: 100%; }
+  .eligibility-table caption { display: block; padding: var(--space-2); margin: 0; background: var(--peach); }
+  .eligibility-table tbody th { width: 100%; }
+  .eligibility-table th, .eligibility-table td { padding: var(--space-2); }
+  .eligibility-table tbody tr + tr > * { border-top: 0; }
+  .eligibility-table tbody tr + tr { border-top: 1px solid var(--line); }
+  .eligibility-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .adl-table td:nth-child(2) { padding-bottom: 0; }
+  .support-choices { grid-template-columns: 1fr; }
+  .match-table td::before { content: attr(data-label); display: block; font-weight: 600; margin-bottom: .5rem; }
+}
+@media print {
+  #eligibility-form, .eligibility-guidance, .eligibility-review, .eligibility-results .button-row { display: none !important; }
+  .eligibility-results { padding: 0; margin: 0; border: 0; }
+  .eligibility-table { font-size: 10pt; }
+  .eligibility-table th, .eligibility-table td { padding: .5rem; }
+}

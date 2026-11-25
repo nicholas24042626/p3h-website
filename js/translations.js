@@ -275,6 +275,7 @@ window.P3HChinese = {
   "The team can help with applications, referrals, training and access arrangements.": "团队可协助您了解申请、转介、培训及使用服务的安排。",
   "Contact the P3H team": "联系 P3H 团队",
   "Activities and highlights": "活动与精彩回顾",
+  "Eligibility": "资格与支持",
   "Staff access": "工作人员入口",
   "Manage activity photos": "管理活动照片",
   "You are signed in. Edit an existing activity or add new photos below.": "已登录。请在下方编辑现有活动或添加新照片。",

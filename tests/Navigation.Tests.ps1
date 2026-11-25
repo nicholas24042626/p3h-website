@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$canonical = @('index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html')
+$canonical = @('index.html', 'assistance.html', 'activities.html', 'eligibility.html', 'resources.html', 'contact.html', 'caregiving-journey.html')
 $allPages = Get-ChildItem -LiteralPath $root -Filter '*.html' -File
 $allPages += Get-ChildItem -LiteralPath (Join-Path $root 'streams') -Filter '*.html' -File
 $checks = 0
@@ -14,7 +14,8 @@ foreach ($file in $allPages) {
     $ids = @([regex]::Matches($html, '\bid="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
     Assert (($ids | Select-Object -Unique).Count -eq $ids.Count) "$($file.Name): duplicate IDs"
     $nav = [regex]::Match($html, '(?s)<nav class="main-nav".*?</nav>').Value
-    Assert (([regex]::Matches($nav, '<a\b')).Count -eq 5) "$($file.Name): expected five primary destinations"
+    Assert (([regex]::Matches($nav, '<a\b')).Count -eq 6) "$($file.Name): expected six primary destinations"
+    Assert ($nav -match '(?s)data-page-link="activities".*?data-page-link="eligibility".*?data-page-link="resources"') "$($file.Name): Eligibility must follow Activities"
     Assert (([regex]::Matches($nav, 'aria-current="page"')).Count -eq 1) "$($file.Name): expected one current destination"
     Assert ($nav -notmatch '<details|<summary') "$($file.Name): primary navigation must be flat"
     Assert ($html -notmatch 'http-equiv="refresh"') "$($file.Name): redirect-only route"

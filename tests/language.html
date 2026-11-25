@@ -32,7 +32,7 @@
   frame.contentWindow.localStorage.removeItem('p3h-language');
   doc = await load('index.html');
   check('First visit defaults to English', doc.documentElement.lang === 'en-SG' && doc.querySelector('h1').textContent.includes('You care for others.'));
-  for (const page of ['index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html']) {
+  for (const page of ['index.html', 'assistance.html', 'activities.html', 'eligibility.html', 'resources.html', 'contact.html', 'caregiving-journey.html']) {
     doc = await load(`${page}?lang=en`);
     const texts = [], attrs = [];
     const walker = doc.createTreeWalker(doc.body, frame.contentWindow.NodeFilter.SHOW_TEXT);

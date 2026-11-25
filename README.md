@@ -8,6 +8,14 @@ Double-click `Open-Website.cmd` to serve the site at `http://localhost:8080/`. K
 
 For another port, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\Start-Website.ps1 -Port 8081` from this folder.
 
+## Eligibility guide
+
+`eligibility.html` is the public, table-style grant and resource finder beside Activities. It separates caregiver details from care-recipient details, asks about all six basic ADLs individually, and supports partial answers, household income bands and the no-income property-value route. Gender is optional and never changes grant suggestions. Answers stay in page memory: there is no form submission, profile storage, account requirement or personal information in links. Clear answers removes the current selections; Print my options is user initiated.
+
+`js/eligibility.js` contains informational matching rules, remaining checks and official source links; `js/eligibility-translations.js` supplies its Chinese copy. HCG, CTG and SMF device criteria were checked against AIC on 25 November 2026. ComCare is referred for a holistic SSO assessment rather than filtered by a hard income cut-off. South West support is referred to the CDC for its additional checks. Unknown details stay uncertain; selections that differ from a scheme's screening criteria remain visible in the expandable Other schemes section. Results are not approvals or a substitute for care assessments. Verify sources before changing the rules or review date.
+
+Open `tests/eligibility.html` on the local server to check age/ADL/income boundaries, PR family conditions, uncertain answers, safe matching, privacy, reset, language switching, print and responsive results. The new page is included in the shared navigation, language and layout checks.
+
 ## Staff activity publishing
 
 Open Activities, choose **Staff access**, enter the configured code and sign in. Add the activity title and date, choose up to six JPEG or PNG photos (3 MB each), add a caption for every photo, confirm approval for public sharing, then choose **Publish photos**. Chinese titles, descriptions and captions are optional. Published photos appear for all visitors, including after a server restart. Existing photo collections remain available.
@@ -36,12 +44,12 @@ WhatsApp (6859 1962), email (caregiversupport@tzuchi.org.sg), islandwide coverag
 
 ## Files
 
-- Edit the six canonical pages: `index.html`, `assistance.html`, `activities.html`, `resources.html`, `contact.html` and `caregiving-journey.html`.
+- Edit the seven canonical pages: `index.html`, `assistance.html`, `activities.html`, `eligibility.html`, `resources.html`, `contact.html` and `caregiving-journey.html`.
 - Other HTML routes, including `streams/`, are generated compatibility copies. Do not edit them directly.
 - `tools/Sync-Layout.ps1` owns primary navigation, the footer, canonical links and compatibility copies. Run it after editing content: `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\Sync-Layout.ps1`.
 - `css/refinements.css` applies the warm orange P3H styling after existing styles.
 - `css/accessibility.css` provides shared reading controls, readable footer contrast, responsive journey layouts and print styles. It is loaded last by the layout sync tool.
-- All six canonical pages share one English / 中文 switch, including navigation, reading controls, FAQs, accessible labels and slideshow counters. English is the first-visit default; no automatic browser-language detection is used. Explicit `?lang=en` / `?lang=zh` links override the saved preference. Internal HTML links carry the current language, including new tabs and compatibility routes. External sites and documents retain their original language.
+- All seven canonical pages share one English / 中文 switch, including navigation, reading controls, FAQs, accessible labels and slideshow counters. English is the first-visit default; no automatic browser-language detection is used. Explicit `?lang=en` / `?lang=zh` links override the saved preference. Internal HTML links carry the current language, including new tabs and compatibility routes. External sites and documents retain their original language.
 - `js/translations.js` contains reviewed Singapore Simplified Chinese copy keyed by normalised English source text. `js/i18n.js` applies the translations while preserving existing markup, filters, focus and section bookmarks. Update dictionary entries whenever English source text changes. The journey guide keeps longer paired `data-language` blocks in its HTML; update both versions together. No translation service, API key or network request is required.
 - English source HTML is the fallback without JavaScript; Chinese guide blocks and inactive controls stay hidden. Text size and site-language preferences use browser-local storage when available; they contain no personal or health information. Browser zoom and print remain usable without JavaScript. Printing with JavaScript temporarily expands disclosures, includes all support sections and restores the previous disclosure state afterward.
 - `js/main.js` controls mobile navigation, active-page indicators and support sections with bookmark and browser history support. Without JavaScript, all sections remain readable.
@@ -60,7 +68,7 @@ Add approved activity content to `activities.html` and confirmed visit arrangeme
 
 ## Navigation and maintenance
 
-The primary navigation is **Home / Caregiver support / Activities / Resources & FAQs / Contact**. Every page has a visible current-page indicator and a Home link. Support functions are reachable through the Caregiver support page and its four section links. Registration and visit guidance live on Contact; FAQs and downloads live on Resources & FAQs.
+The primary navigation is **Home / Caregiver support / Activities / Eligibility / Resources & FAQs / Contact**. Every page has a visible current-page indicator and a Home link. Support functions are reachable through the Caregiver support page and its four section links. Registration and visit guidance live on Contact; FAQs and downloads live on Resources & FAQs.
 
 Regular text hyperlinks open a new tab with `noopener noreferrer`. Navigation menus, section links, buttons, the brand link and Skip to content stay in the current tab. Browsers may hand email or messaging links to the visitor's configured application.
 

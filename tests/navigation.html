@@ -52,11 +52,11 @@
   for (const [path, id] of [['how-we-help.html', 'financial-support'], ['programmes.html#training-programmes', 'training-programmes'], ['streams/stream-2.html', 'support-2']]) {
     doc = await load(path);
     check(`Old URL ${path} displays relevant content`, !doc.getElementById(id).closest('[data-workspace-panel]').hidden);
-    check(`Old URL ${path} has canonical navigation`, doc.querySelectorAll('.main-nav a').length === 5);
+    check(`Old URL ${path} has canonical navigation`, doc.querySelectorAll('.main-nav a').length === 6);
   }
   doc = await load('index.html#about');
   check('About bookmark opens partner details', doc.querySelector('#about').open);
-  for (const page of ['index.html', 'assistance.html', 'activities.html', 'resources.html', 'contact.html', 'caregiving-journey.html']) {
+  for (const page of ['index.html', 'assistance.html', 'activities.html', 'eligibility.html', 'resources.html', 'contact.html', 'caregiving-journey.html']) {
     doc = await load(page);
     check(`${page} fits viewport`, doc.documentElement.scrollWidth <= frame.contentWindow.innerWidth + 1);
     check(`${page} highlights one destination`, doc.querySelectorAll('.main-nav [aria-current="page"]').length === 1);
